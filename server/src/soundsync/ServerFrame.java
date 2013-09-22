@@ -1,6 +1,8 @@
 package soundsync;
 
-import javax.swing.DefaultListModel;
+import javax.swing.UIManager;
+
+import com.camick.TableColumnAdjuster;
 
 /**
  *
@@ -12,7 +14,17 @@ public class ServerFrame extends javax.swing.JFrame {
      * Creates new form ServerFrame
      */
     public ServerFrame() {
+        
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        
         initComponents();
+        
+        adjuster = new TableColumnAdjuster(songList);
+        
         setVisible(true);
     }
 
@@ -25,19 +37,17 @@ public class ServerFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        queue = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
+        removeButton = new javax.swing.JButton();
         playButton = new javax.swing.JButton();
-        stopButton = new javax.swing.JButton();
         skipButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        songList = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("SoundSync Server");
 
-        queue.setModel(new DefaultListModel());
-        jScrollPane1.setViewportView(queue);
-
-        jButton1.setText("Remove");
+        removeButton.setText("Remove");
 
         playButton.setText("Play");
         playButton.addActionListener(new java.awt.event.ActionListener() {
@@ -46,14 +56,27 @@ public class ServerFrame extends javax.swing.JFrame {
             }
         });
 
-        stopButton.setText("Stop");
-        stopButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stopButtonActionPerformed(evt);
+        skipButton.setText("Skip");
+
+        songList.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "", "File", "User"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
+        jScrollPane1.setViewportView(songList);
 
-        skipButton.setText("Skip");
+        jButton1.setText("Kick");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -62,32 +85,29 @@ public class ServerFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(playButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 256, Short.MAX_VALUE)
-                        .addComponent(jButton1))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(stopButton)
-                        .addGap(18, 18, 18)
+                        .addComponent(playButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(skipButton)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(removeButton))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(20, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(stopButton)
-                    .addComponent(skipButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(playButton))
-                .addGap(17, 17, 17))
+                    .addComponent(playButton)
+                    .addComponent(skipButton)
+                    .addComponent(removeButton)
+                    .addComponent(jButton1))
+                .addContainerGap())
         );
 
         pack();
@@ -96,10 +116,6 @@ public class ServerFrame extends javax.swing.JFrame {
     private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_playButtonActionPerformed
-
-    private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_stopButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -135,12 +151,16 @@ public class ServerFrame extends javax.swing.JFrame {
             }
         });
     }
+    
+    
+    public TableColumnAdjuster adjuster;
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JButton playButton;
-    public javax.swing.JList queue;
+    public javax.swing.JButton removeButton;
     public javax.swing.JButton skipButton;
-    public javax.swing.JButton stopButton;
+    public javax.swing.JTable songList;
     // End of variables declaration//GEN-END:variables
 }

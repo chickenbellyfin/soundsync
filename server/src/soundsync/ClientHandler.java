@@ -6,7 +6,7 @@ import java.net.Socket;
 
 public class ClientHandler {
 
-    private String id;
+    public String id;
     private SoundSyncServer server;
     private Socket socket;
     private DataOutputStream out;
@@ -25,8 +25,9 @@ public class ClientHandler {
                     String cmd = in.readUTF();
                     System.out.println(cmd);
                     doCommand(cmd);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch(Exception e){
+                	e.printStackTrace();
+                	disconnect();
                 }
             }
         }
@@ -52,6 +53,8 @@ public class ClientHandler {
             long trackTimeMillis = Long.parseLong(cmd.substring("READY:".length()));
             loaded = true;
             server.clientLoaded(trackTimeMillis);
+        } else if (cmd.startsWith("ADD:")){
+        	submitSong(cmd.substring(4));
         }
     }
     
@@ -65,7 +68,10 @@ public class ClientHandler {
                 long sTime = System.currentTimeMillis();
                 in.readUTF();
                 totalPing += System.currentTimeMillis()-sTime;
-            } catch (Exception e){}
+            } catch (Exception e){
+            	e.printStackTrace();
+            	disconnect();
+            }
         } 
         
         ping = totalPing/tests;
@@ -77,6 +83,7 @@ public class ClientHandler {
             System.out.println(id+" lag "+lag);
         } catch(Exception e){
             e.printStackTrace();
+            disconnect();
         }
     }
 
@@ -93,6 +100,7 @@ public class ClientHandler {
             out.flush();
         } catch (Exception e) {
             e.printStackTrace();
+            disconnect();
         }
 
     }
@@ -103,5 +111,21 @@ public class ClientHandler {
             new Thread(inputProcessor).start();
             //new Thread(outputProcessor).start();
         }
+    }
+    
+    private void submitSong(String loc){
+    	server.addSong(loc, id);
+    }
+    
+    private void disconnect(){
+    	isRunning = false;
+    	
+    	try{
+    		socket.close();
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	
+    	server.removeClient(this);    	
     }
 }

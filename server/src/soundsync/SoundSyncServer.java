@@ -8,15 +8,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import javax.swing.DefaultListModel;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -37,7 +35,7 @@ public class SoundSyncServer implements Runnable{
     private ServerFrame frame;
     
     private String currentStream = "";
-    private DefaultListModel songList;
+    private DefaultTableModel songList;
     
     private boolean startNextTrack = true;
     private long trackStartTime;
@@ -111,7 +109,9 @@ public class SoundSyncServer implements Runnable{
     
     private void setupGUI(){
         frame = new ServerFrame();
-        songList = (DefaultListModel) frame.queue.getModel();      
+        songList = (DefaultTableModel) frame.songList.getModel();
+        
+        addSong("http://130.215.234.149/Akshay/Psy/GS.mp3", "akshay");        
         
         frame.playButton.addActionListener(new ActionListener(){
             @Override
@@ -152,6 +152,16 @@ public class SoundSyncServer implements Runnable{
         }).start();
         
     }
+    
+    public void addSong(String song, String user){
+    	songList.addRow(new Object[]{"", song, user}); 
+    	frame.adjuster.adjustColumns();
+    	frame.repaint();
+    }
+    
+    public void removeClient(ClientHandler h){
+    	clientList.remove(h.id);
+    }
 
            
 
@@ -161,6 +171,7 @@ public class SoundSyncServer implements Runnable{
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+    	
         new SoundSyncServer().run();
     }
 }
