@@ -94,6 +94,10 @@ public class SoundSyncClient {
 
         return connected;
     }
+    
+    public void submitSong(String url){
+    	sendServerMessage("ADD:"+url);
+    }
 
     private void doCommand(String cmd) {
         if(cmd.equals("PING")){
