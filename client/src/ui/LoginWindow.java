@@ -1,4 +1,4 @@
-package dmclient;
+package ui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

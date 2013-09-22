@@ -1,4 +1,4 @@
-package dmclient;
+package ui;
 
 import java.awt.Component;
 import java.awt.Font;
@@ -9,29 +9,44 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import soundsync.SoundSyncClient;
 import dmsongfs.FSElement;
 
 public class ClientWindow extends JFrame implements ActionListener {
 	
-	JLabel user_name;
-	SongController controller;
-	QueueList queue;
-	JButton add_song_btn, delete_songs_btn;
+	private SoundSyncClient soundClient;
 	
-	FSElement song_list;
+	private JLabel user_name;
+	private SongController controller;
+	private QueueList queue;
+	private JButton add_song_btn, delete_songs_btn;
 	
-	String user_id;
+	private FSElement song_list;
+	
+	private String user_id;
 	
 	public ClientWindow(String user_id) {
 		setTitle("Dorm Music Client");
 		
 		this.user_id = user_id;
 		
+		setupGUI();
+		
+		soundClient = new SoundSyncClient();
+		soundClient.connect("",user_id);
+		
+		
+	}
+	
+	private void setupGUI(){
 		user_name = new JLabel();
 		controller = new SongController(user_id);
 		queue = new QueueList(user_id);
@@ -91,13 +106,18 @@ public class ClientWindow extends JFrame implements ActionListener {
 		queue.addSong(new Song("daniel", "Seven Nation Army", "The White Stripes", "something", 4 * 60 + 14));
 		controller.setSong(queue.popHead(), true);
 		
+		File ff = new File("index");
+		System.out.println(ff.getAbsolutePath());
+		
 		try {
-			setSongList((FSElement)(new ObjectInputStream(new FileInputStream(new File(
-					"C:\\Users\\Sonaxaton\\Documents\\Eclipse_Projects\\dorm music client\\bin\\songs"))).readObject()));
+			InputStream remoteIS = new URL("http://130.215.234.149/index").openStream();
+			InputStream localIS = new FileInputStream(new File("index"));
+			
+			setSongList((FSElement)(new ObjectInputStream(remoteIS).readObject()));
 		}
 		catch (ClassNotFoundException | IOException e1) {
 			e1.printStackTrace();
-		}
+		}		
 	}
 	
 	@Override

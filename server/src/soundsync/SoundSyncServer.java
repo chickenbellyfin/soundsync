@@ -77,9 +77,8 @@ public class SoundSyncServer implements Runnable{
                 DataOutputStream tmpOut = new DataOutputStream(newClient.getOutputStream());
                 
                 String user = tmpIn.readUTF();
-                String pass = tmpIn.readUTF();
                 
-                if(authenticate(user, pass)){
+                if(authenticate(user)){
                     tmpOut.writeUTF("GOOD");
                 } else {
                     tmpOut.writeUTF("BAD");
@@ -97,7 +96,7 @@ public class SoundSyncServer implements Runnable{
         }
     }
     
-    private boolean authenticate(String user, String pass){
+    private boolean authenticate(String user){
         return true;
     }
     

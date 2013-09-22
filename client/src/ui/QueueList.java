@@ -1,4 +1,4 @@
-package dmclient;
+package ui;
 
 import java.util.ArrayList;
 import javax.swing.JPanel;

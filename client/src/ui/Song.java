@@ -1,4 +1,4 @@
-package dmclient;
+package ui;
 
 public class Song {
 	

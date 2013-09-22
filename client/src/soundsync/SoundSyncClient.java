@@ -52,28 +52,24 @@ public class SoundSyncClient {
 //        }
 //    };
     public SoundSyncClient() {
-        JFrame f = new JFrame();
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
         
         audio = new AudioPlayer();
 
     }
 
-    public boolean connect(String user, String pass) {
+    public boolean connect(String serverAddr, String user) {
         int tries = 3;
         boolean connected = false;
 
         do {
             if (server == null) {
                 try {
-                    server = new Socket(SERVER_ADDR, PORT);
+                    server = new Socket(serverAddr, PORT);
                     in = new DataInputStream(server.getInputStream());
                     out = new DataOutputStream(server.getOutputStream());
 
                     out.writeUTF(user);
-                    out.writeUTF(pass);
-                    out.flush();
+                    out.flush(); 
                     String authResult = in.readUTF();
 
                     if (authResult.equalsIgnoreCase("GOOD")) {
@@ -101,7 +97,7 @@ public class SoundSyncClient {
 
     private void doCommand(String cmd) {
         if(cmd.equals("PING")){
-            sendServerMessage("PING");            
+            sendServerMessage("PING"); //ping the server back           
         } else if (cmd.startsWith("PLAY:")) {
             long startTime = Long.parseLong(cmd.substring(5));
             playAt(startTime);
@@ -141,11 +137,8 @@ public class SoundSyncClient {
         }
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        SoundSyncClient client = new SoundSyncClient();
-        System.out.println(client.connect("qwer"+System.currentTimeMillis(), "tyuiop"));
-    }
+//    public static void main(String[] args) {
+//        SoundSyncClient client = new SoundSyncClient();
+//        System.out.println(client.connect("qwer"+System.currentTimeMillis(), "tyuiop"));
+//    }
 }
