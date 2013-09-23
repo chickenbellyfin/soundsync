@@ -9,9 +9,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Timer;
+
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
+
 import soundsync.Command;
+
 
 /**
  * 
@@ -191,8 +194,7 @@ public class SoundSyncServer implements Runnable {
 		}
 		songTable.addRow(new Object[] { "", song, user });
 		frame.adjuster.adjustColumns();
-		frame.repaint();
-		
+		frame.repaint();		
 		broadcast(Command.formatCmd(Command.CLIENT_ADD, user, song));
 	}
 	

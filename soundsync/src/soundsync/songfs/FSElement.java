@@ -4,21 +4,27 @@ import java.io.Serializable;
 import java.net.URL;
 import soundsync.ui.Song;
 
+import soundsync.ui.Song;
+
 public class FSElement implements Serializable {
 	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 4281554220143405376L;
+	private static final long serialVersionUID = 4281554220143405377L;
 	
 	private String name;
 	private URL url;
+	
+	private Song song;
+	
 	private FSElement[] children;
 	
-	FSElement(String name, URL url, FSElement[] children) {
+	FSElement(String name, URL url, FSElement[] children, Song song) {
 		this.name = name;
 		this.url = url;
 		this.children = children;
+		this.song = song;
 	}
 	
 	public String getName() {
@@ -46,12 +52,22 @@ public class FSElement implements Serializable {
 		}
 	}
 	
-	public FSElement find(String url) {
+	public FSElement find(String url){
+		if(this.url.toString().equals(url)){
+			return this;
+		} else {
+			for(FSElement e:children){
+				FSElement tmp;
+				if((tmp = e.find(url)) != null){
+					return tmp;
+				}
+			}
+		}
 		return null;
 	}
 	
-	public Song getSong() {
-		return null;
+	public Song getSong(){
+		return song;
 	}
 	
 	@Override

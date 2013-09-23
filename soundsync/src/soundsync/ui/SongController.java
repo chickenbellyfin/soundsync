@@ -170,7 +170,7 @@ public class SongController extends JPanel {
 		this.song = song;
 		
 		if (song != null) {
-			scrubber.setMaximum(song.getLength());
+			scrubber.setMaximum((int) song.getLength());
 			rwd_btn.setEnabled(isOwner());
 			play_btn.setEnabled(isOwner());
 			delete_btn.setText(isOwner() ? "X" : "(X)");
@@ -187,7 +187,7 @@ public class SongController extends JPanel {
 	public void setMuted(boolean muted) {
 		this.muted = muted;
 		mute_btn.setText((muted ? "Un Mute" : "Mute"));
-		client.audio.setMute(muted);
+		client.mAudio.setMute(muted);
 	}
 	
 	public void update(int time) {

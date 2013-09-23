@@ -7,7 +7,7 @@ import java.net.Socket;
 import soundsync.Command;
 
 public class ClientHandler {
-	
+
 	public String id;
 	private SoundSyncServer server;
 	private Socket socket;
@@ -55,9 +55,9 @@ public class ClientHandler {
 	
 	public void doCommand(String s) {
 		System.out.format("Client %s processing command: \"%s\"%n", id, s);
-		
+
 		String[] parts = s.split(Command.CMD_DELIM_REGEX);
-		
+
 		try {
 			String cmd = parts[0];
 			
@@ -91,6 +91,7 @@ public class ClientHandler {
 		for (int i = 0; i < 10; i++) {
 			try {
 				send(Command.PING);
+
 				in.readUTF();
 			}
 			catch (Exception e) {
@@ -118,6 +119,7 @@ public class ClientHandler {
 		try {
 			send(Command.CLIENT_TIME);
 			lag = System.currentTimeMillis() - (Long.parseLong(in.readUTF()) + ping / 2);
+
 			System.out.format("Client %s lag: %d%n", id, lag);
 		}
 		catch (IOException e) {

@@ -12,15 +12,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
+
 import soundsync.client.SoundSyncClient;
 import soundsync.server.SoundSyncServer;
 import soundsync.songfs.FSElement;
 
-public class ClientWindow extends JFrame implements ActionListener {
+public class ClientWindow extends JFrame implements ActionListener, SoundSyncClient.SyncClientListener {
 	
 	public SoundSyncClient soundClient;
 	
@@ -165,6 +167,17 @@ public class ClientWindow extends JFrame implements ActionListener {
 		song_list = fs;
 		//fs.print();
 		//System.out.println((fs.getChildren()[0]).getChildren()[0].toString());
+	}
+
+	@Override
+	public void songAdded(String user, String url) {
+		// TODO: Add the song
+	}
+
+	@Override
+	public void syncDisconnected() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

@@ -17,25 +17,25 @@ import soundsync.ui.LoginWindow;
 public class SoundSyncClient {
 	
 	public interface SyncClientListener {
-		
+		public void songAdded(String user, String url);
 		public void syncDisconnected();
 	}
 	
 	public ClientWindow win;
-	public NetAudioPlayer audio;
-	private String id;
-	private Socket server;
+	public NetAudioPlayer mAudio;
+	private String mId;
+	private Socket mServer;
 	private DataInputStream in;
 	private DataOutputStream out;
-	private boolean isRunning;
+	private boolean mIsRunning;
 	
-	private SyncClientListener listener;
+	private SyncClientListener mListener;
 	
-	private Runnable inputProcessor = new Runnable() {
+	private Runnable mInputProcessor = new Runnable() {
 		
 		@Override
 		public void run() {
-			while (isRunning) {
+			while (mIsRunning) {
 				try {
 					String cmd = in.readUTF();
 					doCommand(cmd);
@@ -55,11 +55,11 @@ public class SoundSyncClient {
 //    };
 	public SoundSyncClient() {
 		win = null;
-		audio = new NetAudioPlayer();
+		mAudio = new NetAudioPlayer();
 	}
 	
 	public boolean connect(String serverAddr, String user) {
-		id = user;
+		mId = user;
 		System.out.format("Attempting to connect to \"%s\" as \"%s\"...%n", serverAddr, user);
 		
 		int tries = 3;
@@ -67,12 +67,12 @@ public class SoundSyncClient {
 		
 		do {
 			System.out.format("%d tries left%n", tries);
-			if (server == null) {
+			if (mServer == null) {
 				try {
-					server = new Socket(serverAddr, SoundSyncServer.PORT);
-					in = new DataInputStream(server.getInputStream());
 					out = new DataOutputStream(server.getOutputStream());
-					
+					mServer = new Socket(serverAddr, SoundSyncClient.PORT);
+					in = new DataInputStream(mServer.getInputStream());
+					out = new DataOutputStream(mServer.getOutputStream());					
 					out.writeUTF(user);
 					out.writeUTF(Command.PROTOCOL_VERSION);
 					out.flush();
@@ -80,10 +80,10 @@ public class SoundSyncClient {
 					
 					if (authResult.equalsIgnoreCase(Command.GOOD)) {
 						connected = true;
-						server.setSoTimeout(0);
+						mServer.setSoTimeout(0);
 					}
 					else if (authResult.equalsIgnoreCase(Command.BAD)) {
-						server = null;
+						mServer = null;
 					}
 				}
 				catch (Exception e) {
@@ -98,8 +98,8 @@ public class SoundSyncClient {
 		
 		if (connected) {
 			System.out.format("Connected!%n");
-			isRunning = true;
-			new Thread(inputProcessor).start();
+			mIsRunning = true;
+			new Thread(mInputProcessor).start();
 			//new Thread(outputProcessor).start();
 		}
 		else {
@@ -114,7 +114,7 @@ public class SoundSyncClient {
 	}
 	
 	private void doCommand(String s) {
-		System.out.format("Client %s processing command: \"%s\"%n", id, s);
+		System.out.format("Client %s processing command: \"%s\"%n", mId, s);
 		String[] parts = s.split(Command.CMD_DELIM_REGEX);
 		
 		try {
@@ -135,22 +135,27 @@ public class SoundSyncClient {
 					playAt(startTime);
 					break;
 				case Command.CLIENT_STOP:
-					audio.stop();
+					mAudio.stop();
 					break;
 				case Command.CLIENT_LOAD:
-					long time = audio.loadSong(url);
-					sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
+					long time = audio.loadSong(url);					sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
 					break;
 				case Command.CLIENT_CLEAR_QUEUE:
-					audio.queue.clear();
+					mAudio.queue.clear();
 					break;
+
 				case Command.CLIENT_ADD:
 					win.queue.addSong(win.song_list.find(url).getSong());
-					break;
-			}
+					if(parts.length >= 3){
+						String songUser = parts[1];
+						String songURL = parts[2];
+						if(mListener != null){
+							mListener.songAdded(songUser, songURL);
+						}
+					}			}
 		}
 		catch (Exception e) {
-			System.err.format("Client %s: Error parsing command \"%s\": %s%n", id, s, e);
+			System.err.format("Client %s: Error parsing command \"%s\": %s%n", mId, s, e);
 		}
 		
 	}
@@ -161,12 +166,12 @@ public class SoundSyncClient {
 			@Override
 			public void run() {
 				if (System.currentTimeMillis() > time) { // anyone with a offset of over 500ms needs this
-					audio.clip.setMicrosecondPosition((System.currentTimeMillis() - time) * 1000);
-					audio.play();
+					mAudio.clip.setMicrosecondPosition((System.currentTimeMillis() - time) * 1000);
+					mAudio.play();
 				}
 				else {
 					while (System.currentTimeMillis() < time);
-					audio.play();
+					mAudio.play();
 				}
 			}
 		}).start();
@@ -174,6 +179,7 @@ public class SoundSyncClient {
 	
 	public void sendServerMessage(String message) {
 		try {
+
 			System.out.format("Sending \"%s\" to server%n", message);
 			out.writeUTF(message);
 			out.flush();
@@ -185,16 +191,16 @@ public class SoundSyncClient {
 	}
 	
 	private void disconnect() {
-		isRunning = false;
-		if (server != null) try {
-			server.close();
+		mIsRunning = false;
+		if (mServer != null) try {
+			mServer.close();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		if (listener != null) {
-			listener.syncDisconnected();
+		if (mListener != null) {
+			mListener.syncDisconnected();
 		}
 		
 	}

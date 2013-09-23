@@ -1,16 +1,20 @@
 package soundsync.ui;
 
-public class Song {
+import java.io.Serializable;
+
+public class Song implements Serializable{
 	
-	public static String formatTime(int time) {
+	private static final long serialVersionUID = -7767597819769697769L;
+
+	public static String formatTime(long time) {
 		return String.format("%d:%02d", time / 60, time % 60);
 	}
 	
 	private String owner;
 	private String name, artist, album;
-	private int length;
+	private long length;
 	
-	public Song(String owner, String name, String artist, String album, int length) {
+	public Song(String owner, String name, String artist, String album, long length) {
 		this.owner = owner;
 		this.name = name;
 		this.artist = artist;
@@ -38,7 +42,7 @@ public class Song {
 		return Song.formatTime(length);
 	}
 	
-	public int getLength() {
+	public long getLength() {
 		return length;
 	}
 	
