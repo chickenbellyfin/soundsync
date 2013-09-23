@@ -29,7 +29,7 @@ public class ClientWindow extends JFrame implements ActionListener {
 	public QueueList queue;
 	private JButton add_song_btn, delete_songs_btn;
 	
-	private FSElement song_list;
+	public FSElement song_list;
 	
 	private String user_id;
 	
@@ -109,10 +109,10 @@ public class ClientWindow extends JFrame implements ActionListener {
 		
 		song_list = null;
 		
-		queue.addSong(new Song("daniel", "Cyan", "Arno Cost", "bla", 7 * 60 + 43));
+		/*queue.addSong(new Song("daniel", "Cyan", "Arno Cost", "bla", 7 * 60 + 43));
 		queue.addSong(new Song("akshay", "Hello Goodbye", "The Beatles", null, 3 * 60 + 14));
 		queue.addSong(new Song("daniel", "Seven Nation Army", "The White Stripes", "something", 4 * 60 + 14));
-		controller.setSong(queue.popHead(), true);
+		controller.setSong(queue.popHead(), true);*/
 		
 		//File ff = new File("index");
 		//System.out.println(ff.getAbsolutePath());

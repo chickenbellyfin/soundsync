@@ -19,6 +19,8 @@ public class ClientHandler {
 	public long ping;
 	public long lag;
 	
+	// TODO: have window with tabs for each client's output and client-specific commands
+	
 	private Runnable inputProcessor = new Runnable() {
 		
 		@Override

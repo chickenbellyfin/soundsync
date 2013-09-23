@@ -145,11 +145,11 @@ public class SoundSyncClient {
 					audio.queue.clear();
 					break;
 				case Command.CLIENT_ADD:
-					//win.queue.addSong(new Song(id, url));
+					win.queue.addSong(win.song_list.find(url).getSong());
 					break;
 			}
 		}
-		catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+		catch (Exception e) {
 			System.err.format("Client %s: Error parsing command \"%s\": %s%n", id, s, e);
 		}
 		

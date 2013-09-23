@@ -2,6 +2,7 @@ package soundsync.songfs;
 
 import java.io.Serializable;
 import java.net.URL;
+import soundsync.ui.Song;
 
 public class FSElement implements Serializable {
 	
@@ -43,6 +44,14 @@ public class FSElement implements Serializable {
 				System.out.print("\t");
 			c.print(depth + 1);
 		}
+	}
+	
+	public FSElement find(String url) {
+		return null;
+	}
+	
+	public Song getSong() {
+		return null;
 	}
 	
 	@Override
