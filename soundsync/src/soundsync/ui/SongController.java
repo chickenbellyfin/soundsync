@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import soundsync.Song;
 import soundsync.client.SoundSyncClient;
 
 public class SongController extends JPanel {

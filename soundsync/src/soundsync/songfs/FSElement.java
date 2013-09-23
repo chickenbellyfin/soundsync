@@ -2,9 +2,7 @@ package soundsync.songfs;
 
 import java.io.Serializable;
 import java.net.URL;
-import soundsync.ui.Song;
-
-import soundsync.ui.Song;
+import soundsync.Song;
 
 public class FSElement implements Serializable {
 	
@@ -52,21 +50,20 @@ public class FSElement implements Serializable {
 		}
 	}
 	
-	public FSElement find(String url){
-		if(this.url.toString().equals(url)){
+	public FSElement find(String url) {
+		if (this.url.toString().equals(url)) {
 			return this;
-		} else {
-			for(FSElement e:children){
+		}
+		else {
+			for (FSElement e : children) {
 				FSElement tmp;
-				if((tmp = e.find(url)) != null){
-					return tmp;
-				}
+				if ((tmp = e.find(url)) != null) { return tmp; }
 			}
 		}
 		return null;
 	}
 	
-	public Song getSong(){
+	public Song getSong() {
 		return song;
 	}
 	

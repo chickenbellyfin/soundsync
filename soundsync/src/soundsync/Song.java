@@ -1,4 +1,4 @@
-package soundsync.ui;
+package soundsync;
 
 import java.io.Serializable;
 

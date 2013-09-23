@@ -17,7 +17,9 @@ import soundsync.ui.LoginWindow;
 public class SoundSyncClient {
 	
 	public interface SyncClientListener {
+		
 		public void songAdded(String user, String url);
+		
 		public void syncDisconnected();
 	}
 	
@@ -69,10 +71,10 @@ public class SoundSyncClient {
 			System.out.format("%d tries left%n", tries);
 			if (mServer == null) {
 				try {
-					out = new DataOutputStream(server.getOutputStream());
-					mServer = new Socket(serverAddr, SoundSyncClient.PORT);
+					out = new DataOutputStream(mServer.getOutputStream());
+					mServer = new Socket(serverAddr, SoundSyncServer.PORT);
 					in = new DataInputStream(mServer.getInputStream());
-					out = new DataOutputStream(mServer.getOutputStream());					
+					out = new DataOutputStream(mServer.getOutputStream());
 					out.writeUTF(user);
 					out.writeUTF(Command.PROTOCOL_VERSION);
 					out.flush();
@@ -138,21 +140,23 @@ public class SoundSyncClient {
 					mAudio.stop();
 					break;
 				case Command.CLIENT_LOAD:
-					long time = audio.loadSong(url);					sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
+					long time = mAudio.loadSong(url);
+					sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
 					break;
 				case Command.CLIENT_CLEAR_QUEUE:
 					mAudio.queue.clear();
 					break;
-
+				
 				case Command.CLIENT_ADD:
 					win.queue.addSong(win.song_list.find(url).getSong());
-					if(parts.length >= 3){
+					if (parts.length >= 3) {
 						String songUser = parts[1];
 						String songURL = parts[2];
-						if(mListener != null){
+						if (mListener != null) {
 							mListener.songAdded(songUser, songURL);
 						}
-					}			}
+					}
+			}
 		}
 		catch (Exception e) {
 			System.err.format("Client %s: Error parsing command \"%s\": %s%n", mId, s, e);
@@ -179,7 +183,6 @@ public class SoundSyncClient {
 	
 	public void sendServerMessage(String message) {
 		try {
-
 			System.out.format("Sending \"%s\" to server%n", message);
 			out.writeUTF(message);
 			out.flush();

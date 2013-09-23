@@ -7,8 +7,8 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
+import soundsync.Song;
 import soundsync.server.SoundSyncServer;
-import soundsync.ui.Song;
 
 import com.mpatric.mp3agic.Mp3File;
 
