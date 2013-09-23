@@ -84,7 +84,7 @@ public class SoundSyncClient {
 					}
 				}
 				catch (Exception e) {
-					System.out.format("Connection error: %s%n", e);
+					System.err.format("Connection error: %s%n", e);
 					disconnect();
 				}
 			}

@@ -68,7 +68,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		if (args.length != 2 && args.length != 3) {
-			System.err.println("Usage: songfs.Main [OUTPUT] [ROOT] [-verbose]");
+			System.err.println("Usage: soundsync.songfs.Main OUTPUT ROOT [-verbose]");
 			System.exit(1);
 		}
 		

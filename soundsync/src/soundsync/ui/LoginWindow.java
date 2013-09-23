@@ -99,7 +99,7 @@ public class LoginWindow extends JFrame {
 		
 		getContentPane().setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-
+		
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 3;
@@ -132,7 +132,7 @@ public class LoginWindow extends JFrame {
 			
 			@Override
 			public void windowClosed(WindowEvent e) {
-				if (start_client) new ClientWindow(login_name.getText());
+				if (start_client) ClientWindow.start(login_name.getText());
 				else System.exit(0);
 			}
 		});

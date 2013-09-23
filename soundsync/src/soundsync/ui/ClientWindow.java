@@ -18,6 +18,17 @@ import soundsync.songfs.FSElement;
 
 public class ClientWindow extends JFrame implements ActionListener {
 	
+	public static void start(String user_id) {
+		ConnectingDialog.showDialog(SoundSyncClient.SERVER_ADDR, user_id);
+		
+		SoundSyncClient ssc = new SoundSyncClient();
+		ssc.connect(SoundSyncClient.SERVER_ADDR, user_id); //comment out this line if server isnt't up...will also cause other errors
+		
+		ConnectingDialog.closeDialog();
+		
+		new ClientWindow(user_id, ssc);
+	}
+	
 	private SoundSyncClient soundClient;
 	
 	private JLabel user_name;
@@ -29,17 +40,12 @@ public class ClientWindow extends JFrame implements ActionListener {
 	
 	private String user_id;
 	
-	public ClientWindow(String user_id) {
+	private ClientWindow(String user_id, SoundSyncClient ssc) {
 		setTitle("Dorm Music Client");
 		
 		this.user_id = user_id;
 		
-		ConnectingDialog.showDialog(SoundSyncClient.SERVER_ADDR, user_id);
-		
-		soundClient = new SoundSyncClient();
-		soundClient.connect(SoundSyncClient.SERVER_ADDR, user_id); //comment out this line if server isnt't up...will also cause other errors
-		
-		ConnectingDialog.closeDialog();
+		soundClient = ssc;
 		
 		setupGUI();
 	}
