@@ -149,9 +149,19 @@ public class SoundSyncServer implements Runnable{
     
     private void sendPlay(){
         System.out.println("PLAY");
+        
         new Thread(new Runnable(){
             @Override
             public void run(){
+//                for(ClientHandler h:clientList.values()){
+//                    try{
+//                    	System.out.println("start pingtest");
+//                        h.pingTest();
+//                        System.out.println("end pt");
+//                    }catch(Exception e){
+//                        e.printStackTrace();
+//                    }
+//                } 
                 trackStartTime = System.currentTimeMillis() + 500;
                 for(ClientHandler h:clientList.values()){
                     try{
