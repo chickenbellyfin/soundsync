@@ -5,7 +5,7 @@ public class Command {
 	public static final String PROTOCOL_VERSION = "1";
 	
 	public static final String CMD_DELIM = "|";
-	public static final String CMD_DELIM_REGEX = "\\" + CMD_DELIM;
+	public static final String CMD_DELIM_REGEX = "\\" + Command.CMD_DELIM;
 	
 	public static final String CLIENT_PLAY = "PLAY";
 	public static final String CLIENT_STOP = "STOP";
@@ -21,7 +21,6 @@ public class Command {
 	public static final String PING = "PING";
 	public static final String GOOD = "GOOD";
 	public static final String BAD = "BAD";
-
 	
 	public static String formatCmd(String cmd, Object... args) {
 		String s = cmd;

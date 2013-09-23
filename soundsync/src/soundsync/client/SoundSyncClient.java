@@ -2,6 +2,7 @@ package soundsync.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import javax.swing.UIManager;
 import soundsync.Command;
@@ -40,8 +41,8 @@ public class SoundSyncClient {
 					//System.out.println("COMMAND: "+cmd);
 					doCommand(cmd);
 				}
-				catch (Exception e) {
-					e.printStackTrace();
+				catch (IOException e) {
+					System.err.format("Connection error: %s%n", e);
 					disconnect();
 				}
 			}
@@ -174,7 +175,7 @@ public class SoundSyncClient {
 	
 	public void sendServerMessage(String message) {
 		try {
-			System.out.format("Client %s sending \"%s\"%n", id, message);
+			System.out.format("Sending \"%s\" to client %s%n", message, id);
 			out.writeUTF(message);
 			out.flush();
 		}

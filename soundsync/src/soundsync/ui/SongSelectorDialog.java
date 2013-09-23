@@ -166,20 +166,12 @@ public class SongSelectorDialog extends javax.swing.JDialog implements TreeSelec
 				layout.createSequentialGroup()
 						.addContainerGap()
 						.addGroup(
-								layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-										.addComponent(jScrollPane1)
-										.addGroup(
-												layout.createSequentialGroup().addComponent(addButton)
-														.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-														.addComponent(cancelButton).addGap(0, 289, Short.MAX_VALUE))).addContainerGap()));
+								layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jScrollPane1)
+										.addGroup(layout.createSequentialGroup().addComponent(addButton).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addComponent(cancelButton).addGap(0, 289, Short.MAX_VALUE)))
+						.addContainerGap()));
 		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-				layout.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-						.addGroup(
-								layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(addButton)
-										.addComponent(cancelButton)).addContainerGap()));
+				layout.createSequentialGroup().addContainerGap().addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+						.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(addButton).addComponent(cancelButton)).addContainerGap()));
 		
 		pack();
 	}// </editor-fold>//GEN-END:initComponents

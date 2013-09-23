@@ -101,8 +101,7 @@ public class NetAudioPlayer {
 			
 			AudioInputStream audioStream = AudioSystem.getAudioInputStream(/*soundStream*/s);
 			AudioFormat baseFormat = audioStream.getFormat();
-			AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(), 16, baseFormat.getChannels(),
-					baseFormat.getChannels() * 2, baseFormat.getSampleRate(), false);
+			AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(), 16, baseFormat.getChannels(), baseFormat.getChannels() * 2, baseFormat.getSampleRate(), false);
 			AudioInputStream audioStream2 = AudioSystem.getAudioInputStream(decodedFormat, audioStream);
 			
 			Clip newClip = AudioSystem.getClip();

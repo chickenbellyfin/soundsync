@@ -1,6 +1,5 @@
 package soundsync.server;
 
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -13,8 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
-import soundsync.server.ClientHandler;
-import soundsync.server.ServerFrame;
 import soundsync.Command;
 
 /**
@@ -147,7 +144,7 @@ public class SoundSyncServer implements Runnable {
 			
 			@Override
 			public void run() {
-
+				
 				trackStartTime = System.currentTimeMillis() + SoundSyncServer.PLAY_DELAY;
 				for (ClientHandler h : clientList.values()) {
 					try {
@@ -165,12 +162,14 @@ public class SoundSyncServer implements Runnable {
 	
 	private void broadcast(final String b) {
 		new Thread(new Runnable() {
+			
 			@Override
 			public void run() {
 				for (ClientHandler h : clientList.values()) {
 					try {
 						h.send(b);
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -181,9 +180,9 @@ public class SoundSyncServer implements Runnable {
 	
 	public void addSong(String song, String user) {
 		for (int i = 0; i < songTable.getRowCount(); i++) {
-			if(songTable.getValueAt(i, COL_URL).equals(song)){ //song is already in the list
+			if (songTable.getValueAt(i, SoundSyncServer.COL_URL).equals(song)) { //song is already in the list
 				return;
-			}			
+			}
 		}
 		songTable.addRow(new Object[] { "", song, user });
 		frame.adjuster.adjustColumns();
