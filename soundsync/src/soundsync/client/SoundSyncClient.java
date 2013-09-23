@@ -58,10 +58,13 @@ public class SoundSyncClient {
 	}
 	
 	public boolean connect(String serverAddr, String user) {
+		System.out.format("Attempting to connect to \"%s\" as \"%s\"...%n", serverAddr, user);
+		
 		int tries = 3;
 		boolean connected = false;
 		
 		do {
+			System.out.format("%d tries left%n", tries);
 			if (server == null) {
 				try {
 					server = new Socket(serverAddr, PORT);
@@ -81,7 +84,7 @@ public class SoundSyncClient {
 					}
 				}
 				catch (Exception e) {
-					e.printStackTrace();
+					System.out.format("Connection error: %s%n", e);
 					disconnect();
 				}
 			}
@@ -91,9 +94,13 @@ public class SoundSyncClient {
 		while (!connected && tries > 0);
 		
 		if (connected) {
+			System.out.format("Connected!%n");
 			isRunning = true;
 			new Thread(inputProcessor).start();
 			//new Thread(outputProcessor).start();
+		}
+		else {
+			System.out.format("Connection failed%n");
 		}
 		
 		return connected;
@@ -158,7 +165,7 @@ public class SoundSyncClient {
 	
 	private void disconnect() {
 		isRunning = false;
-		try {
+		if (server != null) try {
 			server.close();
 		}
 		catch (Exception e) {

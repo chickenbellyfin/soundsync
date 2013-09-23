@@ -18,6 +18,8 @@ import soundsync.songfs.FSElement;
 
 public class ClientWindow extends JFrame implements ActionListener {
 	
+	public static String SERVER_ADDR = "130.215.234.149";
+	
 	private SoundSyncClient soundClient;
 	
 	private JLabel user_name;
@@ -34,8 +36,12 @@ public class ClientWindow extends JFrame implements ActionListener {
 		
 		this.user_id = user_id;
 		
+		ConnectingDialog.showDialog(SERVER_ADDR, user_id);
+		
 		soundClient = new SoundSyncClient();
-		soundClient.connect("130.215.234.149", user_id); //comment out this line if server isnt't up...will also cause other errors
+		soundClient.connect(SERVER_ADDR, user_id); //comment out this line if server isnt't up...will also cause other errors
+		
+		ConnectingDialog.closeDialog();
 		
 		setupGUI();
 	}
@@ -136,10 +142,10 @@ public class ClientWindow extends JFrame implements ActionListener {
 		}
 		else if (s == add_song_btn) {
 			URL[] song_urls = SongSelectorDialog.selectSong(song_list);
-			System.out.println("Selected URL" + (song_urls.length > 1 ? "s" : "") + ":");
+			System.out.format("Submitting URL%s:%n", song_urls.length > 1 ? "s" : "");
 			for (URL url : song_urls) {
 				soundClient.submitSong(url.toString());
-				System.out.println(url);
+				System.out.format("\t%s%n", url);
 			}
 		}
 		else if (s == delete_songs_btn) {
