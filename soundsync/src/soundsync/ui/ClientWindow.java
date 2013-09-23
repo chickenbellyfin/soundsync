@@ -17,7 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import soundsync.SoundSyncClient;
+import soundsync.client.SoundSyncClient;
 import soundsync.songfs.FSElement;
 
 public class ClientWindow extends JFrame implements ActionListener {
@@ -38,17 +38,15 @@ public class ClientWindow extends JFrame implements ActionListener {
 		
 		this.user_id = user_id;
 		
-		setupGUI();
-		
 		soundClient = new SoundSyncClient();
-		//soundClient.connect("",user_id);
+		soundClient.connect("130.215.234.149",user_id); //comment out this line if server isnt't up...will also cause other errors
 		
-		
+		setupGUI();	
 	}
 	
 	private void setupGUI(){
 		user_name = new JLabel();
-		controller = new SongController(user_id);
+		controller = new SongController(user_id, soundClient);
 		queue = new QueueList(user_id);
 		add_song_btn = new JButton();
 		delete_songs_btn = new JButton();
@@ -106,17 +104,17 @@ public class ClientWindow extends JFrame implements ActionListener {
 		queue.addSong(new Song("daniel", "Seven Nation Army", "The White Stripes", "something", 4 * 60 + 14));
 		controller.setSong(queue.popHead(), true);
 		
-		File ff = new File("index");
-		System.out.println(ff.getAbsolutePath());
+		//File ff = new File("index");
+		//System.out.println(ff.getAbsolutePath());
 		
 		try {
 			InputStream remoteIS = new URL("http://130.215.234.149/index").openStream();
-			InputStream localIS = new FileInputStream(new File("index"));
+			//InputStream localIS = new FileInputStream(new File("index"));
 			
 			ObjectInputStream ois = new ObjectInputStream(remoteIS);
 			
 			setSongList((FSElement)(ois.readObject()));
-			ois.close();
+			//ois.close();
 		}
 		catch (ClassNotFoundException | IOException e1) {
 			e1.printStackTrace();
@@ -143,8 +141,10 @@ public class ClientWindow extends JFrame implements ActionListener {
 		else if (s == add_song_btn) {
 			URL[] song_urls = SongSelectorDialog.selectSong(song_list);
 			System.out.println("Selected URL" + (song_urls.length > 1 ? "s" : "") + ":");
-			for (URL url : song_urls)
+			for (URL url : song_urls){
+				soundClient.submitSong(url.toString());
 				System.out.println(url);
+			}
 		}
 		else if (s == delete_songs_btn) {
 			queue.deleteSelected();

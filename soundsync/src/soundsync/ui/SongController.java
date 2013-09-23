@@ -6,13 +6,18 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+import soundsync.client.SoundSyncClient;
+
 public class SongController extends JPanel {
+	
+	SoundSyncClient client;
 	
 	String user_id;
 	
@@ -37,7 +42,8 @@ public class SongController extends JPanel {
 	
 	private boolean muted;
 	
-	public SongController(String user_id) {
+	public SongController(String user_id, SoundSyncClient cl) {
+		client = cl;
 		this.user_id = user_id;
 		prev_song_info = new JLabel();
 		curr_song_name = new JLabel();
@@ -182,7 +188,8 @@ public class SongController extends JPanel {
 	
 	public void setMuted(boolean muted) {
 		this.muted = muted;
-		mute_btn.setText("mute " + (muted ? "on" : "off"));
+		mute_btn.setText((muted ? "Un Mute" : "Mute"));
+		client.audio.setMute(muted);
 	}
 	
 	public void update(int time) {

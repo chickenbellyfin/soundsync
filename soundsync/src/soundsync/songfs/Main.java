@@ -68,7 +68,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		if (args.length != 2 && args.length != 3) {
-			System.err.println("Usage: dmsongfs.Main song_list_file_path song_files_root_path [-verbose]");
+			System.err.println("Usage: songfs.Main [OUTPUT] [ROOT] [-verbose]");
 			System.exit(1);
 		}
 		
