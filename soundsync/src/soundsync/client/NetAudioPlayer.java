@@ -37,6 +37,9 @@ public class NetAudioPlayer {
         try {
         	if(clip != null){
         		clip.stop();
+        		clip.drain();
+        		clip.flush();
+        		clip.close();
         	}
         	if(!queue.isEmpty()){
         		clip = queue.remove(0);
