@@ -22,6 +22,10 @@ public class Song implements Serializable{
 		this.length = length;
 	}
 	
+	public void setOwner(String own){
+		owner = own;
+	}
+	
 	public String getOwner() {
 		return owner;
 	}
