@@ -1,22 +1,57 @@
 package soundsync;
 
+import java.util.ArrayList;
+
 import javax.swing.UIManager;
-import soundsync.ui.LoginWindow;
+
+import soundsync.client.SoundSyncClient;
+import soundsync.server.SoundSyncServer;
+import soundsync.songfs.Indexer;
 
 public class Main {
 	
-	// sync actions by sending exact time to execute in message, should be a little more than max latency from current time
-	
+	/**
+	 * SoundSyncServer
+	 * Indexer
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
+		boolean error = false;
+		String mode;
+		String[] restArgs = new String[]{};
 		
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+		if(args.length > 0){
+			mode = args[0];
+			ArrayList<String> argList = new ArrayList<String>();
+			for(String s:args){
+				argList.add(s);
+			}
+			argList.remove(0);
+			restArgs = argList.toArray(restArgs);
+		} else {
+			error = true;
 		}
 		
-		new LoginWindow();
+		if(!error){
+			mode = args[0];
+			if(mode.startsWith("s") || mode.startsWith("S")){
+				SoundSyncServer.main(restArgs);
+			} else if (mode.startsWith("c") || mode.startsWith("C")){
+				SoundSyncClient.main(restArgs);				
+			}else if(mode.startsWith("i") || mode.startsWith("I")){
+				Indexer.main(restArgs);
+			} else {
+				error = true;
+			}
+			
+		} 
+		
+		if(error){
+			System.err.println("USAGE: soundsync [server|client|index] [args]");
+			System.exit(1);
+		}
+		
 	}
 	
 }

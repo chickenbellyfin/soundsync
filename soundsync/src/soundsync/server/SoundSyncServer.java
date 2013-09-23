@@ -12,9 +12,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Timer;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
+
+import static soundsync.Command.*;
 
 /**
  * 
@@ -23,12 +27,7 @@ import javax.swing.table.DefaultTableModel;
 public class SoundSyncServer implements Runnable {
 	
 	public final int PORT = 1980;
-	
-	public static final String M_PLAY = "PLAY:";
-	public static final String M_STOP = "STOP";
-	public static final String M_LOAD = "LOAD:";
-	public static final String M_CLEAR_QUEUE = "CLEARQUEUE";
-	
+		
 	public static final int COL_URL = 1;
 	
 	private ServerSocket serverSocket;
@@ -70,7 +69,7 @@ public class SoundSyncServer implements Runnable {
 	public void run() {
 		isRunning = true;
 		
-		connectClients: while (isRunning) {
+		while (isRunning) {
 			try {
 				Socket newClient = serverSocket.accept();
 				newClient.setSoTimeout(0);
@@ -78,13 +77,15 @@ public class SoundSyncServer implements Runnable {
 				DataOutputStream tmpOut = new DataOutputStream(newClient.getOutputStream());
 				
 				String user = tmpIn.readUTF();
-				System.out.println(user + " is trying to connect");
+				String userVersion = tmpIn.readUTF();
+				System.out.println(user + " is trying to connect with protocol "+userVersion);
 				
-				if (authenticate(user)) {
-					tmpOut.writeUTF("GOOD");
+				if (userVersion.equals(PROTOCOL_VERSION)) {
+					tmpOut.writeUTF(GOOD);
 				}
 				else {
-					tmpOut.writeUTF("BAD");
+					System.out.printf("%s is had outdated client (user: %d, current:%s)", user, userVersion, PROTOCOL_VERSION);
+					tmpOut.writeUTF(BAD);
 				}
 				tmpOut.flush();
 				
@@ -100,9 +101,6 @@ public class SoundSyncServer implements Runnable {
 		}
 	}
 	
-	private boolean authenticate(String user) {
-		return true;
-	}
 	
 	public void clientLoaded(long time) {
 		trackLength = time;
@@ -123,7 +121,7 @@ public class SoundSyncServer implements Runnable {
 			public void actionPerformed(ActionEvent e) {
 				int selectedRow = frame.songList.getSelectedRow();
 				if (selectedRow >= 0) {
-					broadcast(M_CLEAR_QUEUE);
+					broadcast(CLIENT_CLEAR_QUEUE);
 					sendLoad((String)songTable.getValueAt(selectedRow, COL_URL));
 				}
 			}
@@ -147,7 +145,6 @@ public class SoundSyncServer implements Runnable {
 	}
 	
 	private void sendPlay() {
-		System.out.println("PLAY");
 		
 		new Thread(new Runnable() {
 			
@@ -165,7 +162,7 @@ public class SoundSyncServer implements Runnable {
 				trackStartTime = System.currentTimeMillis() + 500;
 				for (ClientHandler h : clientList.values()) {
 					try {
-						h.send(M_PLAY + (trackStartTime - h.lag));
+						h.send(CLIENT_PLAY + (trackStartTime - h.lag));
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -190,21 +187,30 @@ public class SoundSyncServer implements Runnable {
 	}
 	
 	public void addSong(String song, String user) {
+		for(int i = 0; i < songTable.getRowCount(); i++){
+			
+		}
 		songTable.addRow(new Object[] { "", song, user });
 		frame.adjuster.adjustColumns();
 		frame.repaint();
+		
+		broadcast(CLIENT_ADD+user+"#"+song);
 	}
 	
 	public void removeClient(ClientHandler h) {
 		clientList.remove(h.id);
 	}
 	
-	/**
-	 * @param args
-	 *            the command line arguments
-	 */
 	public static void main(String[] args) {
 		
-		new SoundSyncServer().run();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		SoundSyncServer server = new SoundSyncServer();
+		server.run();
 	}
+
 }

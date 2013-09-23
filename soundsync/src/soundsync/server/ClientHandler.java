@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
+import static soundsync.Command.*;
+
 public class ClientHandler {
 	
 	public String id;
@@ -51,13 +53,13 @@ public class ClientHandler {
 	}
 	
 	public void doCommand(String cmd) {
-		if (cmd.startsWith("READY:")) {
-			long trackTimeMillis = Long.parseLong(cmd.substring("READY:".length()));
+		if (cmd.startsWith(SERVER_READY)) {
+			long trackTimeMillis = Long.parseLong(cmd.substring(SERVER_READY.length()));
 			loaded = true;
 			server.clientLoaded(trackTimeMillis);
 		}
-		else if (cmd.startsWith("ADD:")) {
-			submitSong(cmd.substring(4));
+		else if (cmd.startsWith(SERVER_ADD)) {
+			submitSong(cmd.substring(SERVER_ADD.length()));
 		}
 	}
 	
@@ -68,7 +70,7 @@ public class ClientHandler {
 		
 		for (int i = 0; i < 10; i++) {
 			try {
-				out.writeUTF("PING");
+				out.writeUTF(PING);
 				out.flush();
 				in.readUTF();
 			}
@@ -80,7 +82,7 @@ public class ClientHandler {
 		
 		for (int i = 0; i < tests; i++) {
 			try {
-				out.writeUTF("PING");
+				out.writeUTF(PING);
 				out.flush();
 				long sTime = System.currentTimeMillis();
 				in.readUTF();
@@ -96,7 +98,7 @@ public class ClientHandler {
 		System.out.println(id + " ping " + ping);
 		
 		try {
-			out.writeUTF("TIME");
+			out.writeUTF(CLIENT_TIME);
 			lag = System.currentTimeMillis() - (Long.parseLong(in.readUTF()) + ping / 2);
 			System.out.println(id + " lag " + lag);
 		}
@@ -108,7 +110,7 @@ public class ClientHandler {
 	
 	public void sendLoad(String url) {
 		loaded = false;
-		send("LOAD:" + url);
+		send(CLIENT_LOAD + url);
 		System.out.println(id + " sendLoad");
 		
 	}

@@ -4,6 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
+import javax.swing.UIManager;
+
+import soundsync.ui.LoginWindow;
+import static soundsync.Command.*;
 /**
  * 
  * @author Akshay
@@ -17,7 +21,7 @@ public class SoundSyncClient {
 	
 	public static final int PORT = 1980;
 	public static final String SERVER_ADDR = "130.215.234.149";
-	private static final String GREET = "HI";
+	
 	public NetAudioPlayer audio;
 	private String id;
 	private Socket server;
@@ -72,14 +76,15 @@ public class SoundSyncClient {
 					out = new DataOutputStream(server.getOutputStream());
 					
 					out.writeUTF(user);
+					out.writeUTF(PROTOCOL_VERSION);
 					out.flush();
 					String authResult = in.readUTF();
 					
-					if (authResult.equalsIgnoreCase("GOOD")) {
+					if (authResult.equalsIgnoreCase(GOOD)) {
 						connected = true;
 						server.setSoTimeout(0);
 					}
-					else if (authResult.equalsIgnoreCase("BAD")) {
+					else if (authResult.equalsIgnoreCase(BAD)) {
 						server = null;
 					}
 				}
@@ -107,28 +112,28 @@ public class SoundSyncClient {
 	}
 	
 	public void submitSong(String url) {
-		sendServerMessage("ADD:" + url);
+		sendServerMessage(SERVER_ADD + url);
 	}
 	
 	private void doCommand(String cmd) {
-		if (cmd.equals("PING")) {
-			sendServerMessage("PING"); //ping the server back           
+		if (cmd.equals(PING)) {
+			sendServerMessage(PING); //ping the server back           
 		}
-		else if (cmd.startsWith("PLAY:")) {
+		else if (cmd.startsWith(CLIENT_PLAY)) {
 			long startTime = Long.parseLong(cmd.substring(5));
 			playAt(startTime);
 		}
-		else if (cmd.equalsIgnoreCase("STOP")) {
+		else if (cmd.startsWith(CLIENT_STOP)) {
 			audio.stop();
 		}
-		else if (cmd.startsWith("LOAD:")) {
-			long time = audio.loadSong(cmd.substring("LOAD:".length())); //its probably a url
-			sendServerMessage("READY:" + time);
+		else if (cmd.startsWith(CLIENT_LOAD)) {
+			long time = audio.loadSong(cmd.substring(CLIENT_LOAD.length())); //its probably a url
+			sendServerMessage(SERVER_READY + time);
 		}
-		else if (cmd.equalsIgnoreCase("TIME")) {
+		else if (cmd.startsWith(CLIENT_TIME)) {
 			sendServerMessage("" + System.currentTimeMillis());
 		}
-		else if (cmd.equalsIgnoreCase("CLEARQUEUE")) {
+		else if (cmd.equalsIgnoreCase(CLIENT_CLEAR_QUEUE)) {
 			audio.queue.clear();
 		}
 		
@@ -176,5 +181,16 @@ public class SoundSyncClient {
 			listener.syncDisconnected();
 		}
 		
+	}
+	
+	public static void main(String[] args){
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		LoginWindow loginWnd = new LoginWindow();
 	}
 }

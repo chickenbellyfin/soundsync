@@ -1,6 +1,5 @@
 package soundsync.server;
 
-import javax.swing.UIManager;
 import soundsync.ui.TableColumnAdjuster;
 
 /**
@@ -14,12 +13,12 @@ public class ServerFrame extends javax.swing.JFrame {
 	 */
 	public ServerFrame() {
 		
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		
 		initComponents();
 		
