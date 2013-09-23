@@ -36,9 +36,7 @@ public class SoundSyncClient {
 		public void run() {
 			while (isRunning) {
 				try {
-					//System.out.println("waiting...");
 					String cmd = in.readUTF();
-					//System.out.println("COMMAND: "+cmd);
 					doCommand(cmd);
 				}
 				catch (IOException e) {

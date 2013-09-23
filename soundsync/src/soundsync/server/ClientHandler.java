@@ -28,8 +28,8 @@ public class ClientHandler {
 					String cmd = in.readUTF();
 					doCommand(cmd);
 				}
-				catch (Exception e) {
-					e.printStackTrace();
+				catch (IOException e) {
+					System.err.format("Connection error for client %s: %s%n", id, e);
 					disconnect();
 				}
 			}
