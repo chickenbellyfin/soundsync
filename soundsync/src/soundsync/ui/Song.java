@@ -35,7 +35,7 @@ public class Song {
 	}
 	
 	public String formatLength() {
-		return formatTime(length);
+		return Song.formatTime(length);
 	}
 	
 	public int getLength() {

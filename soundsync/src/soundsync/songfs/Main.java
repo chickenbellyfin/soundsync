@@ -12,24 +12,24 @@ import java.util.ArrayList;
 public class Main {
 	
 	public static FSElement loadFileTree(File root_folder) {
-		return getFile(root_folder, 0);
+		return Main.getFile(root_folder, 0);
 	}
 	
 	private static FSElement getFile(File root, int depth) {
-		URL url = makeURL(root);
+		URL url = Main.makeURL(root);
 		if (root.isFile()) {
-			if (isMusicFile(root)) {
-				if (verbose) printFSE(root, url, depth);
+			if (Main.isMusicFile(root)) {
+				if (Main.verbose) Main.printFSE(root, url, depth);
 				return new FSElement(root.getName(), url, null);
 			}
 			else return null;
 		}
 		else {
-			if (verbose) printFSE(root, url, depth);
+			if (Main.verbose) Main.printFSE(root, url, depth);
 			File[] subs = root.listFiles();
 			ArrayList<FSElement> sub_elements = new ArrayList<FSElement>();
 			for (File sub : subs) {
-				FSElement e = getFile(sub, depth + 1);
+				FSElement e = Main.getFile(sub, depth + 1);
 				if (e != null) sub_elements.add(e);
 			}
 			return new FSElement(root.getName(), url, sub_elements.toArray(new FSElement[] {}));
@@ -55,7 +55,7 @@ public class Main {
 	}
 	
 	private static boolean isMusicFile(File f) {
-		String ext = fileExt(f).toLowerCase();
+		String ext = Main.fileExt(f).toLowerCase();
 		return ext.equals("mp3") || ext.equals("ogg") || ext.equals("wav") || ext.equals("m4a");
 	}
 	
@@ -72,7 +72,7 @@ public class Main {
 			System.exit(1);
 		}
 		
-		verbose = args.length == 3;
+		Main.verbose = args.length == 3;
 		
 		ObjectOutputStream out = null;
 		try {
@@ -83,7 +83,7 @@ public class Main {
 			System.exit(1);
 		}
 		
-		FSElement root = loadFileTree(new File(args[1]));
+		FSElement root = Main.loadFileTree(new File(args[1]));
 		
 		try {
 			out.writeObject(root);

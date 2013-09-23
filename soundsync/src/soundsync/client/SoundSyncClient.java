@@ -3,11 +3,11 @@ package soundsync.client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
-
 import javax.swing.UIManager;
-
+import soundsync.Command;
+import soundsync.server.ClientHandler;
 import soundsync.ui.LoginWindow;
-import static soundsync.Command.*;
+
 /**
  * 
  * @author Akshay
@@ -20,7 +20,6 @@ public class SoundSyncClient {
 	}
 	
 	public static final int PORT = 1980;
-	public static final String SERVER_ADDR = "130.215.234.149";
 	
 	public NetAudioPlayer audio;
 	private String id;
@@ -71,20 +70,20 @@ public class SoundSyncClient {
 			System.out.format("%d tries left%n", tries);
 			if (server == null) {
 				try {
-					server = new Socket(serverAddr, PORT);
+					server = new Socket(serverAddr, SoundSyncClient.PORT);
 					in = new DataInputStream(server.getInputStream());
 					out = new DataOutputStream(server.getOutputStream());
 					
 					out.writeUTF(user);
-					out.writeUTF(PROTOCOL_VERSION);
+					out.writeUTF(Command.PROTOCOL_VERSION);
 					out.flush();
 					String authResult = in.readUTF();
 					
-					if (authResult.equalsIgnoreCase(GOOD)) {
+					if (authResult.equalsIgnoreCase(Command.GOOD)) {
 						connected = true;
 						server.setSoTimeout(0);
 					}
-					else if (authResult.equalsIgnoreCase(BAD)) {
+					else if (authResult.equalsIgnoreCase(Command.BAD)) {
 						server = null;
 					}
 				}
@@ -112,31 +111,45 @@ public class SoundSyncClient {
 	}
 	
 	public void submitSong(String url) {
-		sendServerMessage(SERVER_ADD + url);
+		sendServerMessage(Command.formatCmd(Command.SERVER_ADD, url));
 	}
 	
-	private void doCommand(String cmd) {
-		if (cmd.equals(PING)) {
-			sendServerMessage(PING); //ping the server back           
-		}
-		else if (cmd.startsWith(CLIENT_PLAY)) {
-			long startTime = Long.parseLong(cmd.substring(5));
-			playAt(startTime);
-		}
-		else if (cmd.startsWith(CLIENT_STOP)) {
-			audio.stop();
-		}
-		else if (cmd.startsWith(CLIENT_LOAD)) {
-			long time = audio.loadSong(cmd.substring(CLIENT_LOAD.length())); //its probably a url
-			sendServerMessage(SERVER_READY + time);
-		}
-		else if (cmd.startsWith(CLIENT_TIME)) {
-			sendServerMessage("" + System.currentTimeMillis());
-		}
-		else if (cmd.equalsIgnoreCase(CLIENT_CLEAR_QUEUE)) {
-			audio.queue.clear();
-		}
+	private void doCommand(String s) {
+		System.out.format("Client %s processing command: \"%s\"%n", id, s);
+		String[] parts = s.split(ClientHandler.CMD_DELIM);
 		
+		try {
+			String cmd = parts[0];
+			
+			switch (cmd) {
+				case Command.PING:
+					sendServerMessage(Command.PING); //ping the server back
+					break;
+				case Command.CLIENT_TIME:
+					sendServerMessage("" + System.currentTimeMillis());
+					break;
+				case Command.CLIENT_PLAY:
+					long startTime = Long.parseLong(parts[1]);
+					playAt(startTime);
+					break;
+				case Command.CLIENT_STOP:
+					audio.stop();
+					break;
+				case Command.CLIENT_LOAD:
+					String url = "";
+					for (int i = 1; i < parts.length; i++)
+						url += parts[i];
+					long time = audio.loadSong(url); //its probably a url
+					sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
+					break;
+				case Command.CLIENT_CLEAR_QUEUE:
+					audio.queue.clear();
+					break;
+			}
+		}
+		catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+			System.err.format("Client %s: Error parsing command \"%s\": %s%n", id, s, e);
+		}
 	}
 	
 	public void playAt(final long time) {
@@ -151,7 +164,7 @@ public class SoundSyncClient {
 //                } else {
 				while (System.currentTimeMillis() < time);
 				audio.play();
-				System.out.println("audio.play()");
+				System.out.println("Client play");
 				//}
 			}
 		}).start();
@@ -183,14 +196,15 @@ public class SoundSyncClient {
 		
 	}
 	
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		LoginWindow loginWnd = new LoginWindow();
+		new LoginWindow();
 	}
 }

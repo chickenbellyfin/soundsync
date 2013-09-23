@@ -33,11 +33,15 @@ public class FSElement implements Serializable {
 	}
 	
 	public void print() {
+		print(0);
+	}
+	
+	private void print(int depth) {
 		System.out.println(getName());
-		if (children != null) {
-			for (FSElement c : children) {
-				c.print();
-			}
+		if (children != null) for (FSElement c : children) {
+			for (int i = 0; i < depth; i++)
+				System.out.print("\t");
+			c.print(depth + 1);
 		}
 	}
 	

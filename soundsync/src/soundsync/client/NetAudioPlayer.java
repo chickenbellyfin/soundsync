@@ -61,9 +61,11 @@ public class NetAudioPlayer {
 	public void setMute(boolean isMuted) {
 		muted = isMuted;
 		try {
-			BooleanControl bc = (BooleanControl)clip.getControl(BooleanControl.Type.MUTE);
-			if (bc != null) {
-				bc.setValue(muted); // true to mute the line, false to unmute
+			if (clip != null) {
+				BooleanControl bc = (BooleanControl)clip.getControl(BooleanControl.Type.MUTE);
+				if (bc != null) {
+					bc.setValue(muted); // true to mute the line, false to unmute
+				}
 			}
 		}
 		catch (Exception e) {

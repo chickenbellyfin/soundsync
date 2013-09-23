@@ -1,5 +1,6 @@
 package soundsync.ui;
 
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,13 +10,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
+import javax.swing.WindowConstants;
 import soundsync.client.SoundSyncClient;
 
 public class ConnectingDialog extends JDialog {
 	
 	public static void showDialog(final String addr, final String username) {
-		if (dlg == null) {
-			dlg = new ConnectingDialog(addr, username);
+		if (ConnectingDialog.dlg == null) {
+			ConnectingDialog.dlg = new ConnectingDialog(addr, username);
 			
 			final SwingWorker<SoundSyncClient, Void> worker = new SwingWorker<SoundSyncClient, Void>() {
 				
@@ -29,10 +31,10 @@ public class ConnectingDialog extends JDialog {
 				@Override
 				public void done() {
 					try {
-						dlg.ssc = get();
-						dlg.connected = true;
-						dlg.dispose();
-						dlg = null;
+						new ClientWindow(username, get());
+						ConnectingDialog.dlg.connected = true;
+						ConnectingDialog.dlg.dispose();
+						ConnectingDialog.dlg = null;
 					}
 					catch (InterruptedException ignore) {}
 					catch (java.util.concurrent.ExecutionException e) {
@@ -56,7 +58,6 @@ public class ConnectingDialog extends JDialog {
 	
 	public static ConnectingDialog dlg = null;
 	
-	SoundSyncClient ssc;
 	boolean connected;
 	
 	JLabel message;
@@ -95,7 +96,9 @@ public class ConnectingDialog extends JDialog {
 			}
 		});
 		
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
 		pack();
 		setResizable(false);

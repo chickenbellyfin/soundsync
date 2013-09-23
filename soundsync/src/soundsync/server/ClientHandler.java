@@ -3,10 +3,18 @@ package soundsync.server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
-
-import static soundsync.Command.*;
+import soundsync.Command;
 
 public class ClientHandler {
+	
+	public static final String CMD_DELIM = "$";
+	
+	public static String formatCmd(String cmd, Object... args) {
+		String s = cmd;
+		for (Object arg : args)
+			s += ClientHandler.CMD_DELIM + arg.toString();
+		return s;
+	}
 	
 	public String id;
 	private SoundSyncServer server;
@@ -26,7 +34,6 @@ public class ClientHandler {
 			while (isRunning) {
 				try {
 					String cmd = in.readUTF();
-					System.out.println(cmd);
 					doCommand(cmd);
 				}
 				catch (Exception e) {
@@ -52,14 +59,29 @@ public class ClientHandler {
 		this.out = new DataOutputStream(socket.getOutputStream());
 	}
 	
-	public void doCommand(String cmd) {
-		if (cmd.startsWith(SERVER_READY)) {
-			long trackTimeMillis = Long.parseLong(cmd.substring(SERVER_READY.length()));
-			loaded = true;
-			server.clientLoaded(trackTimeMillis);
+	public void doCommand(String s) {
+		System.out.format("Client %s processing command: \"%s\"%n", id, s);
+		String[] parts = s.split(ClientHandler.CMD_DELIM);
+		
+		try {
+			String cmd = parts[0];
+			
+			switch (cmd) {
+				case Command.SERVER_READY:
+					long trackTimeMillis = Long.parseLong(parts[1]);
+					loaded = true;
+					server.clientLoaded(trackTimeMillis);
+					break;
+				case Command.SERVER_ADD:
+					String url = "";
+					for (int i = 1; i < parts.length; i++)
+						url += parts[i];
+					submitSong(url);
+					break;
+			}
 		}
-		else if (cmd.startsWith(SERVER_ADD)) {
-			submitSong(cmd.substring(SERVER_ADD.length()));
+		catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+			System.err.format("Client %s: Error parsing command \"%s\": %s%n", id, s, e);
 		}
 	}
 	
@@ -70,7 +92,7 @@ public class ClientHandler {
 		
 		for (int i = 0; i < 10; i++) {
 			try {
-				out.writeUTF(PING);
+				out.writeUTF("PING");
 				out.flush();
 				in.readUTF();
 			}
@@ -82,7 +104,7 @@ public class ClientHandler {
 		
 		for (int i = 0; i < tests; i++) {
 			try {
-				out.writeUTF(PING);
+				out.writeUTF("PING");
 				out.flush();
 				long sTime = System.currentTimeMillis();
 				in.readUTF();
@@ -95,12 +117,12 @@ public class ClientHandler {
 		}
 		
 		ping = totalPing / tests;
-		System.out.println(id + " ping " + ping);
+		System.out.format("Client %s ping:%d%n", id, ping);
 		
 		try {
-			out.writeUTF(CLIENT_TIME);
+			out.writeUTF("TIME");
 			lag = System.currentTimeMillis() - (Long.parseLong(in.readUTF()) + ping / 2);
-			System.out.println(id + " lag " + lag);
+			System.out.format("Client %s lag:%d%n", id, lag);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -110,9 +132,8 @@ public class ClientHandler {
 	
 	public void sendLoad(String url) {
 		loaded = false;
-		send(CLIENT_LOAD + url);
-		System.out.println(id + " sendLoad");
-		
+		send(ClientHandler.formatCmd(Command.CLIENT_LOAD, url));
+		System.out.format("Client %s sendLoad%n", id);
 	}
 	
 	public void send(String msg) {

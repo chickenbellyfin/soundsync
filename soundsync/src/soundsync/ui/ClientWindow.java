@@ -15,6 +15,7 @@ import java.net.URL;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 import soundsync.client.SoundSyncClient;
 import soundsync.songfs.FSElement;
 
@@ -96,7 +97,7 @@ public class ClientWindow extends JFrame implements ActionListener {
 			}
 		});
 		
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
 		pack();
 		setLocationByPlatform(true);
@@ -159,7 +160,7 @@ public class ClientWindow extends JFrame implements ActionListener {
 	
 	public void setSongList(FSElement fs) {
 		song_list = fs;
-		fs.print();
+		//fs.print();
 		//System.out.println((fs.getChildren()[0]).getChildren()[0].toString());
 	}
 	
