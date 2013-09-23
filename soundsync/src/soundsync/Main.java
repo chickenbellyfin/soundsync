@@ -1,9 +1,6 @@
 package soundsync;
 
 import java.util.ArrayList;
-
-import javax.swing.UIManager;
-
 import soundsync.client.SoundSyncClient;
 import soundsync.server.SoundSyncServer;
 import soundsync.songfs.Indexer;
@@ -19,35 +16,39 @@ public class Main {
 	public static void main(String[] args) {
 		boolean error = false;
 		String mode;
-		String[] restArgs = new String[]{};
+		String[] restArgs = new String[] {};
 		
-		if(args.length > 0){
+		if (args.length > 0) {
 			mode = args[0];
 			ArrayList<String> argList = new ArrayList<String>();
-			for(String s:args){
+			for (String s : args) {
 				argList.add(s);
 			}
 			argList.remove(0);
 			restArgs = argList.toArray(restArgs);
-		} else {
+		}
+		else {
 			error = true;
 		}
 		
-		if(!error){
+		if (!error) {
 			mode = args[0];
-			if(mode.startsWith("s") || mode.startsWith("S")){
+			if (mode.startsWith("s") || mode.startsWith("S")) {
 				SoundSyncServer.main(restArgs);
-			} else if (mode.startsWith("c") || mode.startsWith("C")){
-				SoundSyncClient.main(restArgs);				
-			}else if(mode.startsWith("i") || mode.startsWith("I")){
+			}
+			else if (mode.startsWith("c") || mode.startsWith("C")) {
+				SoundSyncClient.main(restArgs);
+			}
+			else if (mode.startsWith("i") || mode.startsWith("I")) {
 				Indexer.main(restArgs);
-			} else {
+			}
+			else {
 				error = true;
 			}
 			
-		} 
+		}
 		
-		if(error){
+		if (error) {
 			System.err.println("USAGE: soundsync [server|client|index] [args]");
 			System.exit(1);
 		}
