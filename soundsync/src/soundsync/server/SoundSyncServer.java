@@ -16,7 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
-import static soundsync.Command.*;
+import soundsync.Command;
 
 /**
  * 
@@ -78,13 +78,13 @@ public class SoundSyncServer implements Runnable {
 				
 				String user = tmpIn.readUTF();
 				String userVersion = tmpIn.readUTF();
-				System.out.format("\"%s\" is trying to connect with protocol%s%n", user, userVersion);
-				if (userVersion.equals(PROTOCOL_VERSION)) {
-					tmpOut.writeUTF(GOOD);
+				System.out.format("\"%s\" is trying to connect with protocol %s%n", user, userVersion);
+				if (userVersion.equals(Command.PROTOCOL_VERSION)) {
+					tmpOut.writeUTF(Command.GOOD);
 				}
 				else {
-					System.out.printf("%s is had outdated client (user: %d, current:%s)", user, userVersion, PROTOCOL_VERSION);
-					tmpOut.writeUTF(BAD);
+					System.out.printf("%s is had outdated client (user: %d, current:%s)", user, userVersion, Command.PROTOCOL_VERSION);
+					tmpOut.writeUTF(Command.BAD);
 				}
 				tmpOut.flush();
 				
@@ -119,7 +119,7 @@ public class SoundSyncServer implements Runnable {
 			public void actionPerformed(ActionEvent e) {
 				int selectedRow = frame.songList.getSelectedRow();
 				if (selectedRow >= 0) {
-					broadcast(CLIENT_CLEAR_QUEUE);
+					broadcast(Command.CLIENT_CLEAR_QUEUE);
 					sendLoad((String)songTable.getValueAt(selectedRow, SoundSyncServer.COL_URL));
 				}
 			}
@@ -160,7 +160,7 @@ public class SoundSyncServer implements Runnable {
 				trackStartTime = System.currentTimeMillis() + SoundSyncServer.PLAY_DELAY;
 				for (ClientHandler h : clientList.values()) {
 					try {
-						h.send(ClientHandler.formatCmd(CLIENT_PLAY, trackStartTime - h.lag));
+						h.send(Command.formatCmd(Command.CLIENT_PLAY, trackStartTime - h.lag));
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -192,7 +192,7 @@ public class SoundSyncServer implements Runnable {
 		frame.adjuster.adjustColumns();
 		frame.repaint();
 		
-		broadcast(ClientHandler.formatCmd(CLIENT_ADD, user, song));
+		broadcast(Command.formatCmd(Command.CLIENT_ADD, user, song));
 	}
 	
 	public void removeClient(ClientHandler h) {

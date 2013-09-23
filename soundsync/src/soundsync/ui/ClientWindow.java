@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 import soundsync.client.SoundSyncClient;
+import soundsync.server.SoundSyncServer;
 import soundsync.songfs.FSElement;
 
 public class ClientWindow extends JFrame implements ActionListener {
@@ -115,7 +116,7 @@ public class ClientWindow extends JFrame implements ActionListener {
 		//System.out.println(ff.getAbsolutePath());
 		
 		try {
-			InputStream remoteIS = new URL("http://130.215.234.149/index").openStream();
+			InputStream remoteIS = new URL("http://" + SoundSyncServer.SERVER_ADDR + "/index").openStream();
 			//InputStream localIS = new FileInputStream(new File("index"));
 			
 			ObjectInputStream ois = new ObjectInputStream(remoteIS);

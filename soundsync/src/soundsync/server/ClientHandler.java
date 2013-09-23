@@ -7,15 +7,6 @@ import soundsync.Command;
 
 public class ClientHandler {
 	
-	public static final String CMD_DELIM = "$";
-	
-	public static String formatCmd(String cmd, Object... args) {
-		String s = cmd;
-		for (Object arg : args)
-			s += ClientHandler.CMD_DELIM + arg.toString();
-		return s;
-	}
-	
 	public String id;
 	private SoundSyncServer server;
 	private Socket socket;
@@ -61,7 +52,7 @@ public class ClientHandler {
 	
 	public void doCommand(String s) {
 		System.out.format("Client %s processing command: \"%s\"%n", id, s);
-		String[] parts = s.split(ClientHandler.CMD_DELIM);
+		String[] parts = s.split(Command.CMD_DELIM);
 		
 		try {
 			String cmd = parts[0];
@@ -92,7 +83,7 @@ public class ClientHandler {
 		
 		for (int i = 0; i < 10; i++) {
 			try {
-				out.writeUTF("PING");
+				out.writeUTF(Command.PING);
 				out.flush();
 				in.readUTF();
 			}
@@ -104,7 +95,7 @@ public class ClientHandler {
 		
 		for (int i = 0; i < tests; i++) {
 			try {
-				out.writeUTF("PING");
+				out.writeUTF(Command.PING);
 				out.flush();
 				long sTime = System.currentTimeMillis();
 				in.readUTF();
@@ -117,12 +108,12 @@ public class ClientHandler {
 		}
 		
 		ping = totalPing / tests;
-		System.out.format("Client %s ping:%d%n", id, ping);
+		System.out.format("Client %s ping: %d%n", id, ping);
 		
 		try {
-			out.writeUTF("TIME");
+			out.writeUTF(Command.CLIENT_TIME);
 			lag = System.currentTimeMillis() - (Long.parseLong(in.readUTF()) + ping / 2);
-			System.out.format("Client %s lag:%d%n", id, lag);
+			System.out.format("Client %s lag: %d%n", id, lag);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -132,7 +123,7 @@ public class ClientHandler {
 	
 	public void sendLoad(String url) {
 		loaded = false;
-		send(ClientHandler.formatCmd(Command.CLIENT_LOAD, url));
+		send(Command.formatCmd(Command.CLIENT_LOAD, url));
 		System.out.format("Client %s sendLoad%n", id);
 	}
 	
