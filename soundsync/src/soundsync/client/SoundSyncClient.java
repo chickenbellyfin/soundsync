@@ -3,10 +3,13 @@ package soundsync.client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+
 import javax.swing.UIManager;
+
 import soundsync.Command;
 import soundsync.server.ClientHandler;
 import soundsync.ui.LoginWindow;
+
 
 /**
  * 
@@ -61,6 +64,7 @@ public class SoundSyncClient {
 	}
 	
 	public boolean connect(String serverAddr, String user) {
+		id = user;
 		System.out.format("Attempting to connect to \"%s\" as \"%s\"...%n", serverAddr, user);
 		
 		int tries = 3;
@@ -116,7 +120,7 @@ public class SoundSyncClient {
 	
 	private void doCommand(String s) {
 		System.out.format("Client %s processing command: \"%s\"%n", id, s);
-		String[] parts = s.split(ClientHandler.CMD_DELIM);
+		String[] parts = s.split(Command.CMD_DELIM_REGEX);
 		
 		try {
 			String cmd = parts[0];
@@ -140,7 +144,7 @@ public class SoundSyncClient {
 					for (int i = 1; i < parts.length; i++)
 						url += parts[i];
 					long time = audio.loadSong(url); //its probably a url
-					sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
+					sendServerMessage(Command.formatCmd(Command.SERVER_READY, ""+time));
 					break;
 				case Command.CLIENT_CLEAR_QUEUE:
 					audio.queue.clear();
@@ -150,6 +154,7 @@ public class SoundSyncClient {
 		catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			System.err.format("Client %s: Error parsing command \"%s\": %s%n", id, s, e);
 		}
+
 	}
 	
 	public void playAt(final long time) {
@@ -157,21 +162,23 @@ public class SoundSyncClient {
 			
 			@Override
 			public void run() {
-//                if (System.currentTimeMillis() > time) {
-//                    audio.clip.setMicrosecondPosition((System.currentTimeMillis() - time) * 1000);
-//                    audio.play();
-//                    System.out.println("audio.play()");
-//                } else {
-				while (System.currentTimeMillis() < time);
-				audio.play();
-				System.out.println("Client play");
-				//}
+				if (System.currentTimeMillis() > time) { // anyone with a offset of over 500ms needs this
+					audio.clip.setMicrosecondPosition((System.currentTimeMillis() - time) * 1000);
+					audio.play();
+					System.out.println("audio.play()");
+				} else {
+					while (System.currentTimeMillis() < time)
+						;
+					audio.play();
+					System.out.println("Client play");
+				}
 			}
 		}).start();
 	}
 	
 	public void sendServerMessage(String message) {
 		try {
+			System.out.format("Client %s sending \"%s\"%n", id, message);
 			out.writeUTF(message);
 			out.flush();
 		}

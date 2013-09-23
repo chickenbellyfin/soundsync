@@ -1,8 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package soundsync.server;
+
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +13,13 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
+<<<<<<< .mine
+import soundsync.server.ClientHandler;
+import soundsync.server.ServerFrame;
+import static soundsync.Command.*;
+=======
 import soundsync.Command;
+>>>>>>> .r23
 
 /**
  * 
@@ -148,15 +151,7 @@ public class SoundSyncServer implements Runnable {
 			
 			@Override
 			public void run() {
-//                for(ClientHandler h:clientList.values()){
-//                    try{
-//                    	System.out.println("start pingtest");
-//                        h.pingTest();
-//                        System.out.println("end pt");
-//                    }catch(Exception e){
-//                        e.printStackTrace();
-//                    }
-//                } 
+
 				trackStartTime = System.currentTimeMillis() + SoundSyncServer.PLAY_DELAY;
 				for (ClientHandler h : clientList.values()) {
 					try {
@@ -172,21 +167,27 @@ public class SoundSyncServer implements Runnable {
 		
 	}
 	
-	private void broadcast(String b) {
-		for (ClientHandler h : clientList.values()) {
-			try {
-				h.send(b);
+	private void broadcast(final String b) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for (ClientHandler h : clientList.values()) {
+					try {
+						h.send(b);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		});
 		
 	}
 	
 	public void addSong(String song, String user) {
 		for (int i = 0; i < songTable.getRowCount(); i++) {
-			
+			if(songTable.getValueAt(i, COL_URL).equals(song)){ //song is already in the list
+				return;
+			}			
 		}
 		songTable.addRow(new Object[] { "", song, user });
 		frame.adjuster.adjustColumns();
