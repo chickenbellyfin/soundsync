@@ -6,17 +6,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-
 import soundsync.client.SoundSyncClient;
 import soundsync.songfs.FSElement;
 
@@ -39,12 +35,12 @@ public class ClientWindow extends JFrame implements ActionListener {
 		this.user_id = user_id;
 		
 		soundClient = new SoundSyncClient();
-		soundClient.connect("130.215.234.149",user_id); //comment out this line if server isnt't up...will also cause other errors
+		soundClient.connect("130.215.234.149", user_id); //comment out this line if server isnt't up...will also cause other errors
 		
-		setupGUI();	
+		setupGUI();
 	}
 	
-	private void setupGUI(){
+	private void setupGUI() {
 		user_name = new JLabel();
 		controller = new SongController(user_id, soundClient);
 		queue = new QueueList(user_id);
@@ -118,7 +114,7 @@ public class ClientWindow extends JFrame implements ActionListener {
 		}
 		catch (ClassNotFoundException | IOException e1) {
 			e1.printStackTrace();
-		}		
+		}
 	}
 	
 	@Override
@@ -141,7 +137,7 @@ public class ClientWindow extends JFrame implements ActionListener {
 		else if (s == add_song_btn) {
 			URL[] song_urls = SongSelectorDialog.selectSong(song_list);
 			System.out.println("Selected URL" + (song_urls.length > 1 ? "s" : "") + ":");
-			for (URL url : song_urls){
+			for (URL url : song_urls) {
 				soundClient.submitSong(url.toString());
 				System.out.println(url);
 			}

@@ -1,7 +1,6 @@
 package soundsync;
 
 import javax.swing.UIManager;
-
 import soundsync.ui.LoginWindow;
 
 public class Main {
@@ -10,13 +9,14 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		try{
+		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Exception e){
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		LoginWindow loginWnd = new LoginWindow();
+		new LoginWindow();
 	}
 	
 }
