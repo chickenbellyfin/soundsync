@@ -89,7 +89,7 @@ public class SoundSyncServer implements Runnable {
 				tmpOut.flush();
 				
 				ClientHandler newClientHandler = new ClientHandler(user, newClient, this);
-				String newClientAddr = newClient.getInetAddress().getHostAddress();
+				//String newClientAddr = newClient.getInetAddress().getHostAddress();
 				clientList.put(user, newClientHandler);
 				newClientHandler.pingTest();
 				newClientHandler.start();

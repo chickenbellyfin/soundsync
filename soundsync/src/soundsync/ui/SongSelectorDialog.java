@@ -1,4 +1,4 @@
- package soundsync.ui;
+package soundsync.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -25,6 +25,7 @@ public class ServerFrame extends javax.swing.JFrame {
 		
 		adjuster = new TableColumnAdjuster(songList);
 		
+		setLocationByPlatform(true);
 		setVisible(true);
 	}
 	

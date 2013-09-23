@@ -2,46 +2,78 @@ package soundsync.ui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.SwingWorker;
+import soundsync.client.SoundSyncClient;
 
 public class ConnectingDialog extends JDialog {
 	
-	public static void showDialog(String addr, String username) {
-		if (dlg == null) dlg = new ConnectingDialog(addr, username);
-		else throw new IllegalStateException("Connection dialog already being shown!");
-	}
-	
-	public static void closeDialog() {
-		if (dlg != null) {
-			dlg.connected = true;
-			dlg.dispose();
-			dlg = null;
+	public static void showDialog(final String addr, final String username) {
+		if (dlg == null) {
+			dlg = new ConnectingDialog(addr, username);
+			
+			final SwingWorker<SoundSyncClient, Void> worker = new SwingWorker<SoundSyncClient, Void>() {
+				
+				@Override
+				public SoundSyncClient doInBackground() {
+					SoundSyncClient ssc = new SoundSyncClient();
+					ssc.connect(addr, username); //comment out this line if server isnt't up...will also cause other errors
+					return ssc;
+				}
+				
+				@Override
+				public void done() {
+					try {
+						dlg.ssc = get();
+						dlg.connected = true;
+						dlg.dispose();
+						dlg = null;
+					}
+					catch (InterruptedException ignore) {}
+					catch (java.util.concurrent.ExecutionException e) {
+						String why = null;
+						Throwable cause = e.getCause();
+						if (cause != null) {
+							why = cause.getMessage();
+						}
+						else {
+							why = e.getMessage();
+						}
+						System.err.println("Error connecting: " + why);
+					}
+				}
+			};
+			
+			worker.execute();
 		}
-		else throw new IllegalStateException("No connection dialog open");
+		else throw new IllegalStateException("Connection dialog already being shown!");
 	}
 	
 	public static ConnectingDialog dlg = null;
 	
+	SoundSyncClient ssc;
 	boolean connected;
 	
 	JLabel message;
 	ImageIcon loading_img;
 	JLabel loading_lbl;
 	
-	private ConnectingDialog(String addr, String username) {
+	private ConnectingDialog(final String addr, final String username) {
+		
 		setTitle("SoundSync Connect");
 		
 		connected = false;
 		
 		message = new JLabel();
-		loading_img = new ImageIcon("res\\spinner.gif");
+		loading_img = new ImageIcon("res/spinner.gif");
 		loading_lbl = new JLabel();
 		
-		message.setText(String.format("Connecting to server at %s as %s...", addr, username));
+		message.setText(String.format("Connecting to server at \"%s\" as \"%s\"...", addr, username));
 		loading_lbl.setIcon(loading_img);
 		
 		getContentPane().setLayout(new GridBagLayout());
@@ -49,6 +81,7 @@ public class ConnectingDialog extends JDialog {
 		
 		c.gridx = 0;
 		c.gridy = 0;
+		c.insets = new Insets(5, 5, 5, 5);
 		getContentPane().add(loading_lbl, c);
 		c.gridx = 1;
 		c.gridy = 0;
@@ -61,6 +94,8 @@ public class ConnectingDialog extends JDialog {
 				if (!connected) System.exit(0);
 			}
 		});
+		
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
 		pack();
 		setResizable(false);
