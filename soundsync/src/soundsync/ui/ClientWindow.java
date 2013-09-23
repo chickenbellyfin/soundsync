@@ -22,11 +22,11 @@ import soundsync.songfs.FSElement;
 
 public class ClientWindow extends JFrame implements ActionListener {
 	
-	private SoundSyncClient soundClient;
+	public SoundSyncClient soundClient;
 	
 	private JLabel user_name;
-	private SongController controller;
-	private QueueList queue;
+	public SongController controller;
+	public QueueList queue;
 	private JButton add_song_btn, delete_songs_btn;
 	
 	private FSElement song_list;
@@ -39,6 +39,8 @@ public class ClientWindow extends JFrame implements ActionListener {
 		this.user_id = user_id;
 		
 		soundClient = ssc;
+		
+		ssc.win = this;
 		
 		setupGUI();
 	}

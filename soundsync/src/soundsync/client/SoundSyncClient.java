@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.Socket;
 import javax.swing.UIManager;
 import soundsync.Command;
+import soundsync.server.SoundSyncServer;
+import soundsync.ui.ClientWindow;
 import soundsync.ui.LoginWindow;
 
 /**
@@ -19,8 +21,7 @@ public class SoundSyncClient {
 		public void syncDisconnected();
 	}
 	
-	public static final int PORT = 1980;
-	
+	public ClientWindow win;
 	public NetAudioPlayer audio;
 	private String id;
 	private Socket server;
@@ -53,9 +54,8 @@ public class SoundSyncClient {
 //        }
 //    };
 	public SoundSyncClient() {
-		
+		win = null;
 		audio = new NetAudioPlayer();
-		
 	}
 	
 	public boolean connect(String serverAddr, String user) {
@@ -69,7 +69,7 @@ public class SoundSyncClient {
 			System.out.format("%d tries left%n", tries);
 			if (server == null) {
 				try {
-					server = new Socket(serverAddr, SoundSyncClient.PORT);
+					server = new Socket(serverAddr, SoundSyncServer.PORT);
 					in = new DataInputStream(server.getInputStream());
 					out = new DataOutputStream(server.getOutputStream());
 					
@@ -119,6 +119,9 @@ public class SoundSyncClient {
 		
 		try {
 			String cmd = parts[0];
+			String url = "";
+			for (int i = 1; i < parts.length; i++)
+				url += parts[i];
 			
 			switch (cmd) {
 				case Command.PING:
@@ -135,14 +138,14 @@ public class SoundSyncClient {
 					audio.stop();
 					break;
 				case Command.CLIENT_LOAD:
-					String url = "";
-					for (int i = 1; i < parts.length; i++)
-						url += parts[i];
-					long time = audio.loadSong(url); //its probably a url
+					long time = audio.loadSong(url);
 					sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
 					break;
 				case Command.CLIENT_CLEAR_QUEUE:
 					audio.queue.clear();
+					break;
+				case Command.CLIENT_ADD:
+					//win.queue.addSong(new Song(id, url));
 					break;
 			}
 		}
