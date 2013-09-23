@@ -3,13 +3,9 @@ package soundsync.client;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
-
 import javax.swing.UIManager;
-
 import soundsync.Command;
-import soundsync.server.ClientHandler;
 import soundsync.ui.LoginWindow;
-
 
 /**
  * 
@@ -144,7 +140,7 @@ public class SoundSyncClient {
 					for (int i = 1; i < parts.length; i++)
 						url += parts[i];
 					long time = audio.loadSong(url); //its probably a url
-					sendServerMessage(Command.formatCmd(Command.SERVER_READY, ""+time));
+					sendServerMessage(Command.formatCmd(Command.SERVER_READY, "" + time));
 					break;
 				case Command.CLIENT_CLEAR_QUEUE:
 					audio.queue.clear();
@@ -154,7 +150,7 @@ public class SoundSyncClient {
 		catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			System.err.format("Client %s: Error parsing command \"%s\": %s%n", id, s, e);
 		}
-
+		
 	}
 	
 	public void playAt(final long time) {
@@ -166,9 +162,9 @@ public class SoundSyncClient {
 					audio.clip.setMicrosecondPosition((System.currentTimeMillis() - time) * 1000);
 					audio.play();
 					System.out.println("audio.play()");
-				} else {
-					while (System.currentTimeMillis() < time)
-						;
+				}
+				else {
+					while (System.currentTimeMillis() < time);
 					audio.play();
 					System.out.println("Client play");
 				}

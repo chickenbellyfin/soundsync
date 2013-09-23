@@ -13,13 +13,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
-<<<<<<< .mine
 import soundsync.server.ClientHandler;
 import soundsync.server.ServerFrame;
-import static soundsync.Command.*;
-=======
 import soundsync.Command;
->>>>>>> .r23
 
 /**
  * 

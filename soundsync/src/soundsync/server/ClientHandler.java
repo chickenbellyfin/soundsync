@@ -8,18 +8,7 @@ import java.net.Socket;
 import soundsync.Command;
 
 public class ClientHandler {
-<<<<<<< .mine
-
-	public static String formatCmd(String cmd, Object... args) {
-		String s = cmd;
-		for (Object arg : args)
-			s += Command.CMD_DELIM + arg.toString();
-		return s;
-	}
-
-=======
 	
->>>>>>> .r23
 	public String id;
 	private SoundSyncServer server;
 	private Socket socket;
@@ -65,13 +54,9 @@ public class ClientHandler {
 
 	public void doCommand(String s) {
 		System.out.format("Client %s processing command: \"%s\"%n", id, s);
-<<<<<<< .mine
-		String[] parts = s.split(Command.CMD_DELIM_REGEX);
-
-=======
-		String[] parts = s.split(Command.CMD_DELIM);
 		
->>>>>>> .r23
+		String[] parts = s.split(Command.CMD_DELIM_REGEX);
+		
 		try {
 			String cmd = parts[0];
 
@@ -102,12 +87,7 @@ public class ClientHandler {
 
 		for (int i = 0; i < 10; i++) {
 			try {
-<<<<<<< .mine
 				send(Command.PING);
-=======
-				out.writeUTF(Command.PING);
-				out.flush();
->>>>>>> .r23
 				in.readUTF();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -117,12 +97,7 @@ public class ClientHandler {
 
 		for (int i = 0; i < tests; i++) {
 			try {
-<<<<<<< .mine
 				send(Command.PING);
-=======
-				out.writeUTF(Command.PING);
-				out.flush();
->>>>>>> .r23
 				long sTime = System.currentTimeMillis();
 				in.readUTF();
 				totalPing += System.currentTimeMillis() - sTime;
@@ -136,14 +111,9 @@ public class ClientHandler {
 		System.out.format("Client %s ping: %d%n", id, ping);
 
 		try {
-<<<<<<< .mine
 			send(Command.CLIENT_TIME);
 			lag = System.currentTimeMillis()
 					- (Long.parseLong(in.readUTF()) + ping / 2);
-=======
-			out.writeUTF(Command.CLIENT_TIME);
-			lag = System.currentTimeMillis() - (Long.parseLong(in.readUTF()) + ping / 2);
->>>>>>> .r23
 			System.out.format("Client %s lag: %d%n", id, lag);
 		} catch (IOException e) {
 			e.printStackTrace();
