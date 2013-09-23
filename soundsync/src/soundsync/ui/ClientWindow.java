@@ -18,8 +18,6 @@ import soundsync.songfs.FSElement;
 
 public class ClientWindow extends JFrame implements ActionListener {
 	
-	public static String SERVER_ADDR = "130.215.234.149";
-	
 	private SoundSyncClient soundClient;
 	
 	private JLabel user_name;
@@ -36,10 +34,10 @@ public class ClientWindow extends JFrame implements ActionListener {
 		
 		this.user_id = user_id;
 		
-		ConnectingDialog.showDialog(SERVER_ADDR, user_id);
+		ConnectingDialog.showDialog(SoundSyncClient.SERVER_ADDR, user_id);
 		
 		soundClient = new SoundSyncClient();
-		soundClient.connect(SERVER_ADDR, user_id); //comment out this line if server isnt't up...will also cause other errors
+		soundClient.connect(SoundSyncClient.SERVER_ADDR, user_id); //comment out this line if server isnt't up...will also cause other errors
 		
 		ConnectingDialog.closeDialog();
 		
