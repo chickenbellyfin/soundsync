@@ -62,8 +62,11 @@ public class ClientHandler {
 			switch (cmd) {
 				case Command.SERVER_READY:
 					long trackTimeMillis = Long.parseLong(parts[1]);
-					loaded = true;
-					server.clientLoaded(trackTimeMillis);
+					if (trackTimeMillis > 0) {
+						loaded = true;
+						server.setTrackLength(trackTimeMillis);
+					}
+					server.clientLoaded();
 					break;
 				case Command.SERVER_ADD:
 					String url = "";
@@ -123,7 +126,6 @@ public class ClientHandler {
 	public void sendLoad(String url) {
 		loaded = false;
 		send(Command.formatCmd(Command.CLIENT_LOAD, url));
-		System.out.format("Client %s sendLoad%n", id);
 	}
 	
 	public void send(String msg) {
@@ -137,6 +139,10 @@ public class ClientHandler {
 			disconnect();
 		}
 		
+	}
+	
+	public boolean isLoaded() {
+		return loaded;
 	}
 	
 	public void start() {

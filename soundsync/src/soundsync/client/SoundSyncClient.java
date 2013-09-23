@@ -139,7 +139,7 @@ public class SoundSyncClient {
 					for (int i = 1; i < parts.length; i++)
 						url += parts[i];
 					long time = audio.loadSong(url); //its probably a url
-					sendServerMessage(Command.formatCmd(Command.SERVER_READY, "" + time));
+					sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
 					break;
 				case Command.CLIENT_CLEAR_QUEUE:
 					audio.queue.clear();
@@ -160,12 +160,10 @@ public class SoundSyncClient {
 				if (System.currentTimeMillis() > time) { // anyone with a offset of over 500ms needs this
 					audio.clip.setMicrosecondPosition((System.currentTimeMillis() - time) * 1000);
 					audio.play();
-					System.out.println("audio.play()");
 				}
 				else {
 					while (System.currentTimeMillis() < time);
 					audio.play();
-					System.out.println("Client play");
 				}
 			}
 		}).start();
@@ -173,7 +171,7 @@ public class SoundSyncClient {
 	
 	public void sendServerMessage(String message) {
 		try {
-			System.out.format("Sending \"%s\" to client %s%n", message, id);
+			System.out.format("Sending \"%s\" to server%n", message);
 			out.writeUTF(message);
 			out.flush();
 		}

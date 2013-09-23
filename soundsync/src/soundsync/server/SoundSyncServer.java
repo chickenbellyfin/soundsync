@@ -4,12 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Timer;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import soundsync.Command;
@@ -45,12 +44,13 @@ public class SoundSyncServer implements Runnable {
 	
 	public SoundSyncServer() {
 		try {
-			serverSocket = new ServerSocket(SoundSyncServer.PORT);
+			serverSocket = new ServerSocket(SoundSyncServer.PORT, 0, InetAddress.getLocalHost());
+			System.out.format("Starting server at %s:%05d%n", serverSocket.getInetAddress().getHostAddress(), SoundSyncServer.PORT);
 			serverSocket.setSoTimeout(0);
 		}
 		catch (Exception e) {
-			JOptionPane.showMessageDialog(new JFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			System.exit(0);
+			System.err.format("Error starting server: %s%n", e);
+			System.exit(1);
 		}
 		
 		timer = new Timer();
@@ -96,8 +96,11 @@ public class SoundSyncServer implements Runnable {
 		}
 	}
 	
-	public void clientLoaded(long time) {
+	public void setTrackLength(long time) {
 		trackLength = time;
+	}
+	
+	public void clientLoaded() {
 		loadCount++;
 		if (loadCount == clientList.size()) {
 			loadCount = 0;
@@ -148,7 +151,9 @@ public class SoundSyncServer implements Runnable {
 				trackStartTime = System.currentTimeMillis() + SoundSyncServer.PLAY_DELAY;
 				for (ClientHandler h : clientList.values()) {
 					try {
-						h.send(Command.formatCmd(Command.CLIENT_PLAY, trackStartTime - h.lag));
+						if (h.isLoaded()) {
+							h.send(Command.formatCmd(Command.CLIENT_PLAY, trackStartTime - h.lag));
+						}
 					}
 					catch (Exception e) {
 						e.printStackTrace();
@@ -174,7 +179,7 @@ public class SoundSyncServer implements Runnable {
 					}
 				}
 			}
-		});
+		}).start();
 		
 	}
 	

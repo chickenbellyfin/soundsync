@@ -4,6 +4,7 @@
  */
 package soundsync.client;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,8 +31,8 @@ public class NetAudioPlayer {
 	}
 	
 	public void play() {
-		
 		try {
+			System.out.println("Client play");
 			if (clip != null) {
 				clip.stop();
 				clip.drain();
@@ -45,7 +46,7 @@ public class NetAudioPlayer {
 			clip.start();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			System.err.format("Error playing clip: %s%n", e);
 		}
 	}
 	
@@ -78,13 +79,14 @@ public class NetAudioPlayer {
 	}
 	
 	public long loadSong(String loc) {
+		InputStream s = null;
 		try {
-			System.out.println("loading " + loc);
+			System.out.format("Loading %s%n", loc);
 			long sTime = System.currentTimeMillis();
 			
 			URL url = new URL(loc.replaceAll(" ", "%20"));
 			
-			InputStream s = url.openStream();
+			s = url.openStream();
 			
 //            ArrayList<Byte> soundArray = new ArrayList<Byte>();
 //            int n = 0;
@@ -110,7 +112,7 @@ public class NetAudioPlayer {
 			
 			queue.add(newClip);
 			
-			System.out.println("loaded (" + (System.currentTimeMillis() - sTime) + "ms)");
+			System.out.format("Loaded (%dms)%n", System.currentTimeMillis() - sTime);
 			//clip.start();
 			
 			return newClip.getMicrosecondLength() / 1000;
@@ -118,9 +120,16 @@ public class NetAudioPlayer {
 			
 		}
 		catch (Exception e) {
+			System.err.format("Error loading song: %s%n", e);
+		}
+		
+		if (s != null) try {
+			s.close();
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		return 0;
+		return -1;
 	}
 }
