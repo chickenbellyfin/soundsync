@@ -168,12 +168,9 @@ public class SoundSyncClient {
 
 	public void playAt(final long time) {
 		new Thread(new Runnable() {
-
 			@Override
 			public void run() {
-				if (System.currentTimeMillis() > time) { // anyone with a offset
-															// of over 500ms
-															// needs this
+				if (System.currentTimeMillis() > time) { // anyone with a offset of over 500ms needs this
 					mAudio.clip.setMicrosecondPosition((System
 							.currentTimeMillis() - time) * 1000);
 					mAudio.play();

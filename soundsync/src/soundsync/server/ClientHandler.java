@@ -129,6 +129,7 @@ public class ClientHandler {
 	
 	public void sendLoad(String url) {
 		loaded = false;
+		System.out.println("sendi "+url);
 		send(Command.formatCmd(Command.CLIENT_LOAD, url));
 	}
 	
@@ -147,6 +148,10 @@ public class ClientHandler {
 	
 	public boolean isLoaded() {
 		return loaded;
+	}
+	
+	public void setLoaded(boolean l){
+		loaded = l;
 	}
 	
 	public void start() {

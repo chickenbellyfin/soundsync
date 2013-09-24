@@ -43,7 +43,53 @@ public class SoundSyncServer implements Runnable {
 	
 	private Timer timer;
 	
-	private boolean isRunning = false;
+	private boolean connecIsRunning = false;
+	private boolean playIsRunning = false;
+	
+	private boolean playNextFlag = false;
+	private boolean queueNextFlag = false;
+	
+	private Thread playingThread = new Thread(){
+		@Override
+		public void run(){
+			playIsRunning = true;
+			long queueTime = 0;
+			long trackStopTime = 0;	
+			
+			while(playIsRunning){
+				
+				while(true){
+					try{
+						Thread.sleep(100);
+						if(System.currentTimeMillis() > queueTime){
+							break;
+						}
+					} catch(Exception e){}
+				}					
+				
+				sendNextLoad();//TODO what to send???);
+				queueNextFlag = false;
+				
+				while(true){
+					try{
+						Thread.sleep(50);
+						if(System.currentTimeMillis() >= trackStopTime && loadCount >= clientList.size()){
+							loadCount = 0;
+							break;
+						}
+					} catch (Exception e){}
+				}
+				
+				trackStartTime = System.currentTimeMillis() + SoundSyncServer.PLAY_DELAY;
+				 trackStopTime = trackStartTime + trackLength;
+				queueTime = trackStopTime - 10*1000;
+				
+				sendPlay(trackStartTime);
+
+				playNextFlag = false;
+			}			
+		}
+	};
 	
 	public SoundSyncServer() {
 		try {
@@ -64,11 +110,14 @@ public class SoundSyncServer implements Runnable {
 		
 	}
 	
+	/**
+	 * Listens for and handles incoming connections
+	 */
 	@Override
 	public void run() {
-		isRunning = true;
+		connecIsRunning = true;
 		
-		while (isRunning) {
+		while (connecIsRunning) {
 			try {
 				Socket newClient = serverSocket.accept();
 				newClient.setSoTimeout(0);
@@ -105,10 +154,6 @@ public class SoundSyncServer implements Runnable {
 	
 	public void clientLoaded() {
 		loadCount++;
-		if (loadCount == clientList.size()) {
-			loadCount = 0;
-			sendPlay();
-		}
 	}
 	
 	private void setupGUI() {
@@ -119,24 +164,32 @@ public class SoundSyncServer implements Runnable {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int selectedRow = frame.songList.getSelectedRow();
-				if (selectedRow >= 0) {
-					broadcast(Command.CLIENT_CLEAR_QUEUE);
-					sendLoad((String)songTable.getValueAt(selectedRow, SoundSyncServer.COL_URL));
-				}
+
+				playingThread.start();
+//				int selectedRow = frame.songList.getSelectedRow();
+//				if (selectedRow >= 0) {
+//					broadcast(Command.CLIENT_CLEAR_QUEUE);
+//					
+//				}
 			}
 		});
 		
 	}
 	
-	private void sendLoad(final String url) {
-		new Thread(new Runnable() {
-			
+	private void sendNextLoad() {
+		new Thread(new Runnable() {			
 			@Override
 			public void run() {
+				while(songTable.getRowCount() == 0){ //wait for music to be added
+					try{
+						Thread.sleep(50);
+					} catch(Exception e){}
+				}
+				String nextUrl = (String) songTable.getValueAt(0, COL_URL);
+				songTable.removeRow(0);
 				for (ClientHandler h : clientList.values()) {
 					try {
-						h.sendLoad(url);
+						h.sendLoad(nextUrl);
 					}
 					catch (Exception e) {}
 				}
@@ -144,33 +197,22 @@ public class SoundSyncServer implements Runnable {
 		}).start();
 	}
 	
-	private void sendPlay() {
+	private void sendPlay(long trackStartTime) {
 		System.out.println("SERVER PLAY");
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				
-				trackStartTime = System.currentTimeMillis() + SoundSyncServer.PLAY_DELAY;
-				for (ClientHandler h : clientList.values()) {
-					try {
-						if (h.isLoaded()) {
-							h.send(Command.formatCmd(Command.CLIENT_PLAY, trackStartTime - h.lag));
-						}
-					}
-					catch (Exception e) {
-						e.printStackTrace();
-					}
+		for (ClientHandler h : clientList.values()) {
+			try {
+				if (h.isLoaded()) {
+					h.send(Command.formatCmd(Command.CLIENT_PLAY, trackStartTime - h.lag));
 				}
-				
 			}
-		}).start();
-		
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}	
 	}
 	
 	private void broadcast(final String b) {
-		new Thread(new Runnable() {
-			
+		new Thread(new Runnable() {			
 			@Override
 			public void run() {
 				for (ClientHandler h : clientList.values()) {
@@ -183,7 +225,6 @@ public class SoundSyncServer implements Runnable {
 				}
 			}
 		}).start();
-		
 	}
 	
 	public void addSong(String song, String user) {
