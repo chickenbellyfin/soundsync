@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 
@@ -193,14 +194,20 @@ public class SoundSyncServer implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e){
 				int[] selected = frame.songList.getSelectedRows();
-				for (int i : selected) {
-					String url = (String)songTable.getValueAt(i, COL_URL);
-					songTable.removeRow(i);
-					broadcast(Command.formatCmd(Command.CLIENT_REMOVE, url));
+				ArrayList<String> urls = new ArrayList<String>();
+				for(int i:selected){
+					urls.add((String)songTable.getValueAt(i, COL_URL));
+				}
+				for (String url:urls) {
+					for(int j = 0; j < songTable.getRowCount(); j++){
+						if(url.equals(songTable.getValueAt(j, COL_URL))){
+							songTable.removeRow(j);			
+						}
+						broadcast(Command.formatCmd(Command.CLIENT_REMOVE, url));
+					}
 				}
 			}
-		});
-		
+		});		
 	}
 	
 	private void sendNextLoad() {

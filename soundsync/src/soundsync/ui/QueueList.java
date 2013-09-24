@@ -14,7 +14,7 @@ public class QueueList extends JPanel {
 		public String[] column_names = new String[] { "Name", "Length", "Artist", "Album", "Owner", "X" };
 		
 		@Override
-		public int getRowCount() {
+		public int getRowCount() {			
 			return songs.size();
 		}
 		
@@ -30,7 +30,13 @@ public class QueueList extends JPanel {
 		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			return getSongInfo(songs.get(rowIndex), columnIndex);
+			synchronized(songs){
+				try {
+					return getSongInfo(songs.get(rowIndex), columnIndex);
+				} catch(Exception e){
+					return null;
+				}
+			}
 		}
 		
 		private Object getSongInfo(Song song, int id) {
@@ -81,15 +87,25 @@ public class QueueList extends JPanel {
 	}
 	
 	public void addSong(Song song) {
-		songs.add(song);
-		((SongQueueTableModel)table.getModel()).fireTableDataChanged();
-		// TODO: update table when you add a song
+		synchronized(songs){
+			songs.add(song);
+			System.out.println("add song "+song.getName());
+			table.repaint();
+			((SongQueueTableModel)table.getModel()).fireTableDataChanged();
+			// TODO: update table when you add a song
+		}
 	}
 	
 	public void removeSong(Song song){
-		songs.remove(song);
-		((SongQueueTableModel)table.getModel()).fireTableDataChanged();
+		synchronized(songs){
+			boolean removed = songs.remove(song);
+			System.out.printf("del song %s : %b  ",song.getName(),removed);
+			((SongQueueTableModel)table.getModel()).fireTableDataChanged();
+		}
 	}
+	
+	
+
 	
 	public Song popHead() {
 		Song s = songs.remove(0);

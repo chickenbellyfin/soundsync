@@ -10,6 +10,7 @@ import javax.swing.UIManager;
 import soundsync.Command;
 import soundsync.Song;
 import soundsync.server.SoundSyncServer;
+import soundsync.songfs.FSElement;
 import soundsync.ui.ClientWindow;
 import soundsync.ui.LoginWindow;
 
@@ -36,7 +37,7 @@ public class SoundSyncClient {
 
 	private SyncClientListener mListener;
 
-	private Runnable mInputProcessor = new Runnable() {
+	private Thread mInputProcessor = new Thread() {
 
 		@Override
 		public void run() {
@@ -102,9 +103,8 @@ public class SoundSyncClient {
 
 		if (connected) {
 			System.out.format("Connected!%n");
-			mIsRunning = true;
-			new Thread(mInputProcessor).start();
-			// new Thread(outputProcessor).start();
+			//mIsRunning = true;
+			//mInputProcessor.start();
 		} else {
 			System.out.format("Connection failed%n");
 		}
@@ -159,17 +159,19 @@ public class SoundSyncClient {
 				String url = "";
 				for (int i = 2; i < parts.length; i++)
 					url += parts[i];
-				Song song = win.song_list.find(url).getSong();
+				Song song = win.songList.find(url).getSong();
 				song.setOwner(parts[1]);
 				win.queue.addSong(song);
+				break;
 			}
 			
 			case Command.CLIENT_REMOVE: {
 				String url = "";
-				for (int i = 2; i < parts.length; i++)
+				for (int i = 1; i < parts.length; i++)
 					url += parts[i];
-				Song song = win.song_list.find(url).getSong();				
+				Song song = win.songList.find(url).getSong();
 				win.queue.removeSong(song);
+				break;
 			}
 				
 			
@@ -207,6 +209,13 @@ public class SoundSyncClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 			disconnect();
+		}
+	}
+	
+	public void startInputProcessor(){
+		if(!mIsRunning){
+			mIsRunning = true;
+			mInputProcessor.start();
 		}
 	}
 

@@ -31,7 +31,8 @@ public class ConnectingDialog extends JDialog {
 				@Override
 				public void done() {
 					try {
-						new ClientWindow(username, get());
+						SoundSyncClient client = get();
+						new ClientWindow(username, client);
 						ConnectingDialog.dlg.connected = true;
 						ConnectingDialog.dlg.dispose();
 						ConnectingDialog.dlg = null;

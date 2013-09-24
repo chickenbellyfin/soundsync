@@ -31,7 +31,7 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 	public QueueList queue;
 	private JButton add_song_btn, delete_songs_btn;
 	
-	public FSElement song_list;
+	public FSElement songList;
 	
 	private String user_id;
 	
@@ -45,6 +45,8 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		ssc.win = this;
 		
 		setupGUI();
+		
+		soundClient.startInputProcessor();
 	}
 	
 	private void setupGUI() {
@@ -109,7 +111,7 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		setResizable(false);
 		setVisible(true);
 		
-		song_list = null;
+		songList = null;
 		
 		/*queue.addSong(new Song("daniel", "Cyan", "Arno Cost", "bla", 7 * 60 + 43));
 		queue.addSong(new Song("akshay", "Hello Goodbye", "The Beatles", null, 3 * 60 + 14));
@@ -125,7 +127,8 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 			
 			ObjectInputStream ois = new ObjectInputStream(remoteIS);
 			
-			setSongList((FSElement)(ois.readObject()));
+			songList = (FSElement)(ois.readObject());
+			//setSongList((FSElement)(ois.readObject()));
 			//ois.close();
 		}
 		catch (ClassNotFoundException | IOException e1) {
@@ -151,7 +154,7 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 			}
 		}
 		else if (s == add_song_btn) {
-			URL[] song_urls = SongSelectorDialog.selectSong(song_list);
+			URL[] song_urls = SongSelectorDialog.selectSong(songList);
 			System.out.format("Submitting URL%s:%n", song_urls.length > 1 ? "s" : "");
 			for (URL url : song_urls) {
 				soundClient.submitSong(url.toString());
@@ -163,11 +166,12 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		}
 	}
 	
-	public void setSongList(FSElement fs) {
-		song_list = fs;
-		//fs.print();
-		//System.out.println((fs.getChildren()[0]).getChildren()[0].toString());
-	}
+//	public void setSongList(FSElement fs) {
+//		System.out.println("setSongList "+fs.toString());
+//		songList = fs;
+//		//fs.print();
+//		//System.out.println((fs.getChildren()[0]).getChildren()[0].toString());
+//	}
 
 	@Override
 	public void songAdded(String user, String url) {
