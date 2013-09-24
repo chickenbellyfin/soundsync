@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
-
 import soundsync.Song;
 import soundsync.server.SoundSyncServer;
-
 import com.mpatric.mp3agic.Mp3File;
 
 // akshay-computer (130.215.234.149)
@@ -35,17 +33,19 @@ public class Indexer {
 				try {
 					Mp3File tmp = new Mp3File(root.getAbsolutePath());
 					length = tmp.getLengthInSeconds();
-					if(tmp.hasId3v2Tag()){
+					if (tmp.hasId3v2Tag()) {
 						album = tmp.getId3v2Tag().getAlbum();
 						artist = tmp.getId3v2Tag().getArtist();
 						title = tmp.getId3v2Tag().getTitle();
-					} else if(tmp.hasId3v1Tag()){
+					}
+					else if (tmp.hasId3v1Tag()) {
 						album = tmp.getId3v1Tag().getAlbum();
 						artist = tmp.getId3v1Tag().getArtist();
 						title = tmp.getId3v1Tag().getTitle();
 					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
+				}
+				catch (Exception e) {
+					System.err.format("Error reading MP3 file: %s%n", e);
 					e.printStackTrace();
 				}
 				fileCount++;
@@ -129,7 +129,7 @@ public class Indexer {
 			e.printStackTrace();
 		}
 		
-		System.out.printf("Indexed %d music files in %d ms", fileCount, (System.currentTimeMillis()-sTime));
+		System.out.printf("Indexed %d music files in %d ms", fileCount, (System.currentTimeMillis() - sTime));
 		
 	}
 }

@@ -30,8 +30,6 @@ public class LoginWindow extends JFrame {
 	
 	boolean start_client;
 	
-	// TODO: add server ip field with default
-	
 	public LoginWindow() {
 		setTitle("SoundSync Client");
 		

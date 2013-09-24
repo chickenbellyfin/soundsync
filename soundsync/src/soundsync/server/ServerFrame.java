@@ -49,13 +49,6 @@ public class ServerFrame extends javax.swing.JFrame {
 		removeButton.setText("Remove");
 		
 		playButton.setText("Play");
-		playButton.addActionListener(new java.awt.event.ActionListener() {
-			
-			@Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				playButtonActionPerformed(evt);
-			}
-		});
 		
 		skipButton.setText("Skip");
 		
@@ -93,10 +86,6 @@ public class ServerFrame extends javax.swing.JFrame {
 		
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
-	
-	private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
-		// TODO add your handling code here:
-	}//GEN-LAST:event_playButtonActionPerformed
 	
 	/**
 	 * @param args

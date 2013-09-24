@@ -1,13 +1,10 @@
 package soundsync.ui;
 
 import java.util.ArrayList;
-
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
-
 import soundsync.Song;
 
 public class QueueList extends JPanel {
@@ -85,7 +82,7 @@ public class QueueList extends JPanel {
 	
 	public void addSong(Song song) {
 		songs.add(song);
-		((SongQueueTableModel)table.getModel()).fireTableChanged(new TableModelEvent(table.getModel()));
+		((SongQueueTableModel)table.getModel()).fireTableDataChanged();
 		// TODO: update table when you add a song
 	}
 	
