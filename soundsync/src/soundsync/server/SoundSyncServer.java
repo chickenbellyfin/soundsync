@@ -27,6 +27,7 @@ public class SoundSyncServer implements Runnable {
 	
 	public static final int PLAY_DELAY = 500;
 	public static final int COL_URL = 1;
+	public static final int COL_USER = 2;
 	
 	private ServerSocket serverSocket;
 	private HashMap<String, ClientHandler> clientList;
@@ -48,6 +49,12 @@ public class SoundSyncServer implements Runnable {
 	
 	private boolean playNextFlag = false;
 	private boolean queueNextFlag = false;
+	
+	private String currentSong = "";
+	private String nextSong = "";
+	
+	
+	
 	
 	private Thread playingThread = new Thread(){
 		@Override
@@ -140,6 +147,12 @@ public class SoundSyncServer implements Runnable {
 				//String newClientAddr = newClient.getInetAddress().getHostAddress();
 				clientList.put(user, newClientHandler);
 				newClientHandler.pingTest();
+				
+				//add the songs that are already in the queue
+				for(int i = 0; i < songTable.getRowCount(); i++){
+					newClientHandler.send(Command.formatCmd(Command.CLIENT_ADD, songTable.getValueAt(i, COL_USER), songTable.getValueAt(i, COL_URL)));
+				}
+				
 				newClientHandler.start();
 			}
 			catch (Exception e) {
@@ -158,19 +171,33 @@ public class SoundSyncServer implements Runnable {
 	
 	private void setupGUI() {
 		frame = new ServerFrame();
-		songTable = (DefaultTableModel)frame.songList.getModel();
+		songTable = (DefaultTableModel)frame.songList.getModel();		
 		
-		frame.playButton.addActionListener(new ActionListener() {
-			
+		frame.playButton.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				playingThread.start();
-//				int selectedRow = frame.songList.getSelectedRow();
-//				if (selectedRow >= 0) {
-//					broadcast(Command.CLIENT_CLEAR_QUEUE);
-//					
-//				}
+			}
+		});
+		
+		frame.skipButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				broadcast(Command.formatCmd(Command.CLIENT_STOP, ""));
+				broadcast(Command.formatCmd(Command.CLIENT_CLEAR_QUEUE, ""));
+				
+			}
+		});
+		
+		frame.removeButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				int[] selected = frame.songList.getSelectedRows();
+				for (int i : selected) {
+					String url = (String)songTable.getValueAt(i, COL_URL);
+					songTable.removeRow(i);
+					broadcast(Command.formatCmd(Command.CLIENT_REMOVE, url));
+				}
 			}
 		});
 		
@@ -185,11 +212,12 @@ public class SoundSyncServer implements Runnable {
 						Thread.sleep(50);
 					} catch(Exception e){}
 				}
-				String nextUrl = (String) songTable.getValueAt(0, COL_URL);
+				nextSong = (String) songTable.getValueAt(0, COL_URL);
 				songTable.removeRow(0);
+				
 				for (ClientHandler h : clientList.values()) {
 					try {
-						h.sendLoad(nextUrl);
+						h.sendLoad(nextSong);
 					}
 					catch (Exception e) {}
 				}
@@ -199,6 +227,10 @@ public class SoundSyncServer implements Runnable {
 	
 	private void sendPlay(long trackStartTime) {
 		System.out.println("SERVER PLAY");
+		
+		broadcast(Command.formatCmd(Command.CLIENT_REMOVE, currentSong));
+		currentSong = nextSong;
+		
 		for (ClientHandler h : clientList.values()) {
 			try {
 				if (h.isLoaded()) {

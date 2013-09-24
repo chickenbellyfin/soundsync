@@ -129,6 +129,7 @@ public class ServerFrame extends javax.swing.JFrame {
 		});
 	}
 	
+	
 	public TableColumnAdjuster adjuster;
 	
 	// Variables declaration - do not modify//GEN-BEGIN:variables

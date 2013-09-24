@@ -124,19 +124,24 @@ public class SoundSyncClient {
 			String cmd = parts[0];
 
 			switch (cmd) {
+			
 			case Command.PING:
 				sendServerMessage(Command.PING); // ping the server back
 				break;
+				
 			case Command.CLIENT_TIME:
 				sendServerMessage("" + System.currentTimeMillis());
 				break;
+				
 			case Command.CLIENT_PLAY:
 				long startTime = Long.parseLong(parts[1]);
 				playAt(startTime);
 				break;
+				
 			case Command.CLIENT_STOP:
 				mAudio.stop();
 				break;
+				
 			case Command.CLIENT_LOAD: {
 				String url = "";
 				for (int i = 1; i < parts.length; i++)
@@ -145,11 +150,12 @@ public class SoundSyncClient {
 				sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
 				break;
 			}
+			
 			case Command.CLIENT_CLEAR_QUEUE:
 				mAudio.queue.clear();
 				break;
 
-			case Command.CLIENT_ADD: {
+			case Command.CLIENT_ADD:  {
 				String url = "";
 				for (int i = 2; i < parts.length; i++)
 					url += parts[i];
@@ -157,6 +163,16 @@ public class SoundSyncClient {
 				song.setOwner(parts[1]);
 				win.queue.addSong(song);
 			}
+			
+			case Command.CLIENT_REMOVE: {
+				String url = "";
+				for (int i = 2; i < parts.length; i++)
+					url += parts[i];
+				Song song = win.song_list.find(url).getSong();				
+				win.queue.removeSong(song);
+			}
+				
+			
 			}
 		} catch (Exception e) {
 			System.err.format("Client %s: Error parsing command \"%s\": %s%n",

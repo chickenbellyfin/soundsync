@@ -86,6 +86,11 @@ public class QueueList extends JPanel {
 		// TODO: update table when you add a song
 	}
 	
+	public void removeSong(Song song){
+		songs.remove(song);
+		((SongQueueTableModel)table.getModel()).fireTableDataChanged();
+	}
+	
 	public Song popHead() {
 		Song s = songs.remove(0);
 		((SongQueueTableModel)table.getModel()).fireTableRowsDeleted(0, 1);
