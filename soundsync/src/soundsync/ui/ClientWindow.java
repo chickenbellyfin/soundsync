@@ -18,9 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
-import soundsync.Command;
+import soundsync.Config;
 import soundsync.client.SoundSyncClient;
-import soundsync.server.SoundSyncServer;
 import soundsync.songfs.FSElement;
 
 public class ClientWindow extends JFrame implements ActionListener, SoundSyncClient.SyncClientListener {
@@ -39,12 +38,10 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 	public ClientWindow(String user_id, SoundSyncClient ssc) {
 		setTitle("SoundSync Client");
 	
-		
 		this.user_id = user_id;
 		soundClient = ssc;
 		ssc.win = this;
 		
-
 		setupGUI();
 		
 		setVisible(true);		
@@ -114,23 +111,12 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		
 		songList = null;
 		
-		/*queue.addSong(new Song("daniel", "Cyan", "Arno Cost", "bla", 7 * 60 + 43));
-		queue.addSong(new Song("akshay", "Hello Goodbye", "The Beatles", null, 3 * 60 + 14));
-		queue.addSong(new Song("daniel", "Seven Nation Army", "The White Stripes", "something", 4 * 60 + 14));
-		controller.setSong(queue.popHead(), true);*/
-		
-		//File ff = new File("index");
-		//System.out.println(ff.getAbsolutePath());
-		
 		try {
-			InputStream remoteIS = new URL("http://" + SoundSyncServer.SERVER_ADDR + "/index").openStream();
-			//InputStream localIS = new FileInputStream(new File("index"));
+			InputStream remoteIS = new URL("http://" + Config.SERVER_ADDR + "/index").openStream();
 			
 			ObjectInputStream ois = new ObjectInputStream(remoteIS);
 			
 			songList = (FSElement)(ois.readObject());
-			//setSongList((FSElement)(ois.readObject()));
-			//ois.close();
 		}
 		catch (ClassNotFoundException | IOException e1) {
 			e1.printStackTrace();
@@ -170,13 +156,8 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 	public void nextSong() {
 		if (queue.hasSongs()) controller.setSong(queue.getHead(), true);
 	}
-	
-//	public void setSongList(FSElement fs) {
-//		System.out.println("setSongList "+fs.toString());
-//		songList = fs;
-//		//fs.print();
-//		//System.out.println((fs.getChildren()[0]).getChildren()[0].toString());
-//	}
+
+
 
 	@Override
 	public void songAdded(String user, String url) {
