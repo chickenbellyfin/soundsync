@@ -25,16 +25,16 @@ public class NetAudioPlayer {
 	
 	private boolean muted = false;
 	
-	ArrayList<AudioInputStream> queue;
+	ArrayList<Clip> queue;
 	
 	public NetAudioPlayer() {
 		
 		try{
-			clip = AudioSystem.getClip();
+			//clip = AudioSystem.getClip();
 		} catch(Exception e){
 			e.printStackTrace();
 		}
-		queue = new ArrayList<AudioInputStream>();
+		queue = new ArrayList<Clip>();
 	}
 	
 	public void play() {
@@ -47,7 +47,7 @@ public class NetAudioPlayer {
 				clip.close();
 			}
 			if (!queue.isEmpty()) {
-				clip.open(queue.remove(0));
+				clip = queue.remove(0);
 			}
 			setMute(muted);
 			clip.start();
@@ -105,8 +105,11 @@ public class NetAudioPlayer {
 			AudioFormat baseFormat = audioStream.getFormat();
 			AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(), 16, baseFormat.getChannels(), baseFormat.getChannels() * 2, baseFormat.getSampleRate(), false);
 			AudioInputStream audioStream2 = AudioSystem.getAudioInputStream(decodedFormat, audioStream);
-												
-			queue.add(audioStream2);
+					
+			Clip newClip = AudioSystem.getClip();
+			newClip.open(audioStream2);
+			
+			queue.add(newClip);
 			
 			System.out.format("Loaded (%dms)%n", System.currentTimeMillis() - sTime);
 			return true;			

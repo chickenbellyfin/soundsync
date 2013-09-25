@@ -189,16 +189,16 @@ public class SoundSyncClient {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if (System.currentTimeMillis() > time) { // anyone with a offset of over 500ms needs this
-					mAudio.setPan((System.currentTimeMillis() - time) * 1000);
-					
-					mAudio.play();
-				} else {
+//				if (System.currentTimeMillis() > time) { // anyone with a offset of over 500ms needs this
+//					mAudio.setPan((System.currentTimeMillis() - time) * 1000);
+//					
+//					mAudio.play();
+//				} else {
 					while (System.currentTimeMillis() < time)
 						;
 					mAudio.play();
 				}
-			}
+			//}
 		}).start();
 	}
 
