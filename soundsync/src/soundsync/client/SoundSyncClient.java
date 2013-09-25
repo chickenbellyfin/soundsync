@@ -5,14 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-import javax.swing.UIManager;
-
 import soundsync.Command;
+import soundsync.Config;
 import soundsync.Song;
-import soundsync.server.SoundSyncServer;
-import soundsync.songfs.FSElement;
 import soundsync.ui.ClientWindow;
-import soundsync.ui.LoginWindow;
 
 /**
  * 
@@ -76,7 +72,7 @@ public class SoundSyncClient {
 			System.out.format("%d tries left%n", tries);
 			if (mServer == null) {
 				try {
-					mServer = new Socket(serverAddr, SoundSyncServer.PORT);
+					mServer = new Socket(serverAddr, Config.PORT);
 					out = new DataOutputStream(mServer.getOutputStream());
 					in = new DataInputStream(mServer.getInputStream());
 					out = new DataOutputStream(mServer.getOutputStream());

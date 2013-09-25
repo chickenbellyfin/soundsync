@@ -10,12 +10,12 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Timer;
 
-import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import soundsync.Command;
+import soundsync.Config;
+import soundsync.ui.ServerFrame;
 
 
 /**
@@ -23,10 +23,7 @@ import soundsync.Command;
  * @author Akshay
  */
 public class SoundSyncServer implements Runnable {
-	
-	public static final int PORT = 1980;
-	public static final String SERVER_ADDR = "130.215.234.149";
-	
+		
 	public static final int PLAY_DELAY = 500;
 	public static final int COL_URL = 1;
 	public static final int COL_USER = 2;
@@ -36,22 +33,15 @@ public class SoundSyncServer implements Runnable {
 	
 	private ServerFrame frame;
 	
-	private String currentStream = "";
 	private DefaultTableModel songTable;
 	
-	private boolean startNextTrack = true;
 	private long trackStartTime;
 	private long trackLength;
 	private int loadCount = 0;
-	
-	private Timer timer;
-	
+		
 	private boolean connecIsRunning = false;
 	private boolean playIsRunning = false;
-	
-	private boolean playNextFlag = false;
-	private boolean queueNextFlag = false;
-	
+
 	private String currentSong = "";
 	private String nextSong = "";
 	
@@ -77,7 +67,6 @@ public class SoundSyncServer implements Runnable {
 				}					
 				
 				sendNextLoad();//TODO what to send???);
-				queueNextFlag = false;
 				
 				while(true){
 					try{
@@ -95,23 +84,20 @@ public class SoundSyncServer implements Runnable {
 				
 				sendPlay(trackStartTime);
 
-				playNextFlag = false;
 			}			
 		}
 	};
 	
 	public SoundSyncServer() {
 		try {
-			serverSocket = new ServerSocket(SoundSyncServer.PORT, 0, InetAddress.getLocalHost());
-			System.out.format("Starting server at %s:%05d%n", serverSocket.getInetAddress().getHostAddress(), SoundSyncServer.PORT);
+			serverSocket = new ServerSocket(Config.PORT, 0, InetAddress.getLocalHost());
+			System.out.format("Starting server at %s:%05d%n", serverSocket.getInetAddress().getHostAddress(), Config.PORT);
 			serverSocket.setSoTimeout(0);
 		}
 		catch (Exception e) {
 			System.err.format("Error starting server: %s%n", e);
 			System.exit(1);
 		}
-		
-		timer = new Timer();
 		
 		setupGUI();
 		
@@ -173,6 +159,12 @@ public class SoundSyncServer implements Runnable {
 	
 	private void setupGUI() {
 		frame = new ServerFrame();
+		String address = "";
+		try{
+			address = "@ "+InetAddress.getLocalHost().getHostAddress();
+		} catch (Exception e){}
+		
+		frame.setTitle(String.format("SoundSync Server %s", address));
 		songTable = (DefaultTableModel)frame.songList.getModel();		
 		
 		frame.playButton.addActionListener(new ActionListener() {			

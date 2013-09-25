@@ -38,11 +38,7 @@ public class ClientHandler {
 		}
 	};
 	
-	// private Runnable outputProcessor = new Runnable(){
-	// @Override
-	// public void run(){
-	// }
-	// };
+
 	public ClientHandler(String id, Socket s, SoundSyncServer srv) throws Exception {
 		this.id = id;
 		

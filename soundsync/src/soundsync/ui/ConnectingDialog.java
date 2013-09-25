@@ -16,8 +16,8 @@ import soundsync.client.SoundSyncClient;
 public class ConnectingDialog extends JDialog {
 	
 	public static void showDialog(final String addr, final String username) {
-		if (ConnectingDialog.dlg == null) {
-			ConnectingDialog.dlg = new ConnectingDialog(addr, username);
+		if (ConnectingDialog.dialog == null) {
+			ConnectingDialog.dialog = new ConnectingDialog(addr, username);
 			
 			final SwingWorker<SoundSyncClient, Void> worker = new SwingWorker<SoundSyncClient, Void>() {
 				
@@ -33,9 +33,9 @@ public class ConnectingDialog extends JDialog {
 					try {
 						SoundSyncClient client = get();
 						new ClientWindow(username, client);
-						ConnectingDialog.dlg.connected = true;
-						ConnectingDialog.dlg.dispose();
-						ConnectingDialog.dlg = null;
+						ConnectingDialog.dialog.connected = true;
+						ConnectingDialog.dialog.dispose();
+						ConnectingDialog.dialog = null;
 					}
 					catch (InterruptedException ignore) {}
 					catch (java.util.concurrent.ExecutionException e) {
@@ -57,13 +57,13 @@ public class ConnectingDialog extends JDialog {
 		else throw new IllegalStateException("Connection dialog already being shown!");
 	}
 	
-	public static ConnectingDialog dlg = null;
+	public static ConnectingDialog dialog = null;
 	
 	boolean connected;
 	
 	JLabel message;
-	ImageIcon loading_img;
-	JLabel loading_lbl;
+	ImageIcon loadingImage;
+	JLabel loadingLabel;
 	
 	private ConnectingDialog(final String addr, final String username) {
 		
@@ -72,11 +72,11 @@ public class ConnectingDialog extends JDialog {
 		connected = false;
 		
 		message = new JLabel();
-		loading_img = new ImageIcon("res/spinner.gif");
-		loading_lbl = new JLabel();
+		loadingImage = new ImageIcon("res/spinner.gif");
+		loadingLabel = new JLabel();
 		
 		message.setText(String.format("Connecting to server at \"%s\" as \"%s\"...", addr, username));
-		loading_lbl.setIcon(loading_img);
+		loadingLabel.setIcon(loadingImage);
 		
 		getContentPane().setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -84,7 +84,7 @@ public class ConnectingDialog extends JDialog {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.insets = new Insets(5, 5, 5, 5);
-		getContentPane().add(loading_lbl, c);
+		getContentPane().add(loadingLabel, c);
 		c.gridx = 1;
 		c.gridy = 0;
 		getContentPane().add(message, c);

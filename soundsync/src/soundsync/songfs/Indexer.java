@@ -1,7 +1,5 @@
 package soundsync.songfs;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,11 +9,9 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.ProgressMonitor;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
+import soundsync.Config;
 import soundsync.Song;
-import soundsync.server.SoundSyncServer;
 import soundsync.ui.IndexerDialog;
 
 import com.mpatric.mp3agic.Mp3File;
@@ -24,7 +20,7 @@ import com.mpatric.mp3agic.Mp3File;
 // dan-computer (130.215.234.145)
 
 public class Indexer {
-	
+	private static long startTime;
 	private static int fileCount = 0;
 	private static int processedFileCount = 0;
 	
@@ -62,7 +58,9 @@ public class Indexer {
 				
 				processedFileCount++;
 				monitor.setProgress(processedFileCount);
-				monitor.setNote(processedFileCount+"/"+fileCount);
+				long remaining = ((System.currentTimeMillis()-startTime)/processedFileCount) * (fileCount-processedFileCount);
+				monitor.setNote(String.format("%d:%d remaining (%d/%d)", remaining/60, remaining%60, processedFileCount, fileCount));
+				//monitor.setNote(processedFileCount+"/"+fileCount);
 				if(monitor.isCanceled()){
 					System.exit(0);
 				}
@@ -101,7 +99,7 @@ public class Indexer {
 		try {
 			String p = f.getAbsolutePath().replaceAll("\\\\", "/");
 			p = p.substring(p.indexOf('.') + 1);
-			return new URL("http://" + SoundSyncServer.SERVER_ADDR + p);
+			return new URL("http://" + Config.SERVER_ADDR + p);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -125,11 +123,11 @@ public class Indexer {
 	
 	public static void showIndexerDialog(){
 		IndexerDialog dialog = new IndexerDialog(new JFrame(), true);
+		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 		System.out.println("dialog closed");
 		if(dialog.ok){
-			root = new File(dialog.getSelectedRoot());
-			
+			root = new File(dialog.getSelectedRoot());			
 			fileCount = countFiles(root);
 
 			monitor = new ProgressMonitor(new JFrame(), "Indexing MP3 files...", "Preparing...", 0, fileCount);
@@ -140,8 +138,7 @@ public class Indexer {
 	}
 	
 	static class IndexerThread extends Thread {
-		public void run(){
-			
+		public void run(){			
 			ObjectOutputStream out = null;
 			try {
 				out = new ObjectOutputStream(new FileOutputStream(new File("index")));
@@ -151,7 +148,7 @@ public class Indexer {
 			}
 			
 			monitor.setNote(processedFileCount+"/"+fileCount);
-			long sTime = System.currentTimeMillis();
+			startTime = System.currentTimeMillis();
 			FSElement rootElement = Indexer.loadFileTree(root);
 			try {
 				out.writeObject(rootElement);
@@ -159,9 +156,8 @@ public class Indexer {
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.printf("Indexed %d music files in %d ms", processedFileCount, (System.currentTimeMillis() - sTime));
+			System.out.printf("Indexed %d music files in %d ms", processedFileCount, (System.currentTimeMillis() - startTime));
 			System.exit(0);
-
 		}
 	}
 	
@@ -177,37 +173,4 @@ public class Indexer {
 		}
 		return count;
 	}
-	
-
-//	
-//	public static void main(String[] args) {
-//		long sTime = System.currentTimeMillis();
-//		if (args.length < 2) {
-//			System.err.println("Usage: soundsync.Main index OUTPUT ROOT [-verbose]");
-//			System.exit(1);
-//		}
-//		
-//		Indexer.verbose = args.length == 3;
-//		
-//		ObjectOutputStream out = null;
-//		try {
-//			out = new ObjectOutputStream(new FileOutputStream(new File(args[0])));
-//		}
-//		catch (IOException e) {
-//			e.printStackTrace();
-//			System.exit(1);
-//		}
-//		
-//		FSElement root = Indexer.loadFileTree(new File(args[1]));
-//		
-//		try {
-//			out.writeObject(root);
-//		}
-//		catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		System.out.printf("Indexed %d music files in %d ms", fileCount, (System.currentTimeMillis() - sTime));
-//		
-//	}
 }

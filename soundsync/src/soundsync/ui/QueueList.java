@@ -98,7 +98,7 @@ public class QueueList extends JPanel {
 	
 	public void removeSong(Song song) {
 		synchronized (songs) {
-			boolean removed = songs.remove(song);
+			songs.remove(song);
 			((SongQueueTableModel)table.getModel()).fireTableDataChanged();
 		}
 	}

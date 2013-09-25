@@ -1,6 +1,5 @@
-package soundsync.server;
+package soundsync.ui;
 
-import soundsync.ui.TableColumnAdjuster;
 
 /**
  * 
@@ -53,11 +52,6 @@ public class ServerFrame extends javax.swing.JFrame {
         removeButton.setText("Remove");
 
         playButton.setText("Play");
-        playButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                playButtonActionPerformed(evt);
-            }
-        });
 
         skipButton.setText("Skip");
 

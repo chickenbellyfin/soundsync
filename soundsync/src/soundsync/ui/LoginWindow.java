@@ -10,6 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,7 +18,8 @@ import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import soundsync.server.SoundSyncServer;
+
+import soundsync.Config;
 
 public class LoginWindow extends JFrame {
 	
@@ -79,7 +81,7 @@ public class LoginWindow extends JFrame {
 		addr_lbl.setText("Server Address:");
 		
 		addr_name.setColumns(20);
-		addr_name.setText(SoundSyncServer.SERVER_ADDR);
+		addr_name.setText(Config.SERVER_ADDR);
 		addr_name.addKeyListener(new KeyAdapter() {
 			
 			@Override

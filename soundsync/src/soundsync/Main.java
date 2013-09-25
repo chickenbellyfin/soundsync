@@ -9,6 +9,7 @@ import javax.swing.UIManager;
 
 import soundsync.server.SoundSyncServer;
 import soundsync.songfs.Indexer;
+import soundsync.ui.Launcher;
 import soundsync.ui.LoginWindow;
 
 public class Main {	
@@ -60,7 +61,7 @@ public class Main {
 	
 	public static void startIndexer(){
 		
-		int needed = JOptionPane.showOptionDialog(new JFrame(), "Are you trying hosting a SoundSync Server?", "Indexer",
+		int needed = JOptionPane.showOptionDialog(new JFrame(), "Are you trying to host a SoundSync Server?", "Indexer",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 		if(needed == JOptionPane.YES_OPTION){
 			launcher.dispose();
