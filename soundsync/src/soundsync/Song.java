@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 public class Song implements Serializable{
 	
-	private static final long serialVersionUID = -7767597819769697769L;
+	private static final long serialVersionUID = -7767597819769697770L;
 
 	public static String formatTime(long time) {
-		return String.format("%d:%02d", time / 60, time % 60);
+		return String.format("%d:%02d", time / (1000*60), time % (1000*60));
 	}
 	
 	private String owner;

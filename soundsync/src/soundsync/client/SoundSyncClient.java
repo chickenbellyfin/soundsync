@@ -146,8 +146,9 @@ public class SoundSyncClient {
 				String url = "";
 				for (int i = 1; i < parts.length; i++)
 					url += parts[i];
-				long time = mAudio.loadSong(url);
-				sendServerMessage(Command.formatCmd(Command.SERVER_READY, time));
+				boolean loaded = mAudio.loadSong(url);
+				long time = win.songList.find(url).getSong().getLength();
+				sendServerMessage(Command.formatCmd(Command.SERVER_READY, (loaded?time:-1)));
 				break;
 			}
 			
@@ -189,8 +190,8 @@ public class SoundSyncClient {
 			@Override
 			public void run() {
 				if (System.currentTimeMillis() > time) { // anyone with a offset of over 500ms needs this
-					mAudio.clip.setMicrosecondPosition((System
-							.currentTimeMillis() - time) * 1000);
+					mAudio.setPan((System.currentTimeMillis() - time) * 1000);
+					
 					mAudio.play();
 				} else {
 					while (System.currentTimeMillis() < time)
@@ -232,16 +233,5 @@ public class SoundSyncClient {
 			mListener.syncDisconnected();
 		}
 
-	}
-
-	public static void main(String[] args) {
-
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		new LoginWindow();
 	}
 }

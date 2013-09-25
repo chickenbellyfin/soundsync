@@ -89,7 +89,6 @@ public class QueueList extends JPanel {
 	public void addSong(Song song) {
 		synchronized(songs){
 			songs.add(song);
-			System.out.println("add song "+song.getName());
 			table.repaint();
 			((SongQueueTableModel)table.getModel()).fireTableDataChanged();
 			// TODO: update table when you add a song
@@ -99,7 +98,6 @@ public class QueueList extends JPanel {
 	public void removeSong(Song song){
 		synchronized(songs){
 			boolean removed = songs.remove(song);
-			System.out.printf("del song %s : %b  ",song.getName(),removed);
 			((SongQueueTableModel)table.getModel()).fireTableDataChanged();
 		}
 	}

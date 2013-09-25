@@ -177,7 +177,11 @@ public class SoundSyncServer implements Runnable {
 		frame.playButton.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				playingThread.start();
+				if(!playIsRunning){
+					playingThread.start();
+				} else {
+					//TODO: skip the song
+				}
 			}
 		});
 		
@@ -280,19 +284,5 @@ public class SoundSyncServer implements Runnable {
 	
 	public void removeClient(ClientHandler h) {
 		clientList.remove(h.id);
-	}
-	
-	public static void main(String[] args) {
-		
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		SoundSyncServer server = new SoundSyncServer();
-		server.run();
-	}
-	
+	}	
 }

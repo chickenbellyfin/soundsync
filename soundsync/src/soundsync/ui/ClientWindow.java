@@ -37,14 +37,16 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 	
 	public ClientWindow(String user_id, SoundSyncClient ssc) {
 		setTitle("Dorm Music Client");
+	
 		
 		this.user_id = user_id;
-		
 		soundClient = ssc;
-		
 		ssc.win = this;
 		
+
 		setupGUI();
+		
+		setVisible(true);		
 		
 		soundClient.startInputProcessor();
 	}
@@ -54,8 +56,7 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		controller = new SongController(user_id, soundClient);
 		queue = new QueueList(user_id);
 		add_song_btn = new JButton();
-		delete_songs_btn = new JButton();
-		
+		delete_songs_btn = new JButton();		
 		user_name.setText("Logged in as: " + user_id);
 		user_name.setFont(new Font("Comic Sans MS", Font.PLAIN, 10));
 		
@@ -109,7 +110,6 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		pack();
 		setLocationByPlatform(true);
 		setResizable(false);
-		setVisible(true);
 		
 		songList = null;
 		
