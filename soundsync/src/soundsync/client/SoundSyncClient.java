@@ -136,6 +136,7 @@ public class SoundSyncClient {
 			case Command.CLIENT_PLAY:
 				long startTime = Long.parseLong(parts[1]);
 				playAt(startTime);
+				win.nextSong();
 				break;
 				
 			case Command.CLIENT_STOP:
@@ -232,6 +233,6 @@ public class SoundSyncClient {
 		if (mListener != null) {
 			mListener.syncDisconnected();
 		}
-
+		
 	}
 }

@@ -14,7 +14,7 @@ public class QueueList extends JPanel {
 		public String[] column_names = new String[] { "Name", "Length", "Artist", "Album", "Owner", "X" };
 		
 		@Override
-		public int getRowCount() {			
+		public int getRowCount() {
 			return songs.size();
 		}
 		
@@ -30,10 +30,11 @@ public class QueueList extends JPanel {
 		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			synchronized(songs){
+			synchronized (songs) {
 				try {
 					return getSongInfo(songs.get(rowIndex), columnIndex);
-				} catch(Exception e){
+				}
+				catch (Exception e) {
 					return null;
 				}
 			}
@@ -87,7 +88,7 @@ public class QueueList extends JPanel {
 	}
 	
 	public void addSong(Song song) {
-		synchronized(songs){
+		synchronized (songs) {
 			songs.add(song);
 			table.repaint();
 			((SongQueueTableModel)table.getModel()).fireTableDataChanged();
@@ -95,15 +96,16 @@ public class QueueList extends JPanel {
 		}
 	}
 	
-	public void removeSong(Song song){
-		synchronized(songs){
+	public void removeSong(Song song) {
+		synchronized (songs) {
 			boolean removed = songs.remove(song);
 			((SongQueueTableModel)table.getModel()).fireTableDataChanged();
 		}
 	}
 	
-	
-
+	public Song getHead() {
+		return songs.get(0);
+	}
 	
 	public Song popHead() {
 		Song s = songs.remove(0);

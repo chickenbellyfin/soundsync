@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
+import soundsync.Command;
 import soundsync.client.SoundSyncClient;
 import soundsync.server.SoundSyncServer;
 import soundsync.songfs.FSElement;
@@ -143,11 +144,11 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 			controller.update(0);
 		}
 		else if (s == controller.fwd_btn) {
-			if (queue.hasSongs()) controller.setSong(queue.popHead(), true);
+			//nextSong();
 		}
 		else if (s == controller.delete_btn) {
 			if (controller.isOwner()) {
-				if (queue.hasSongs()) controller.setSong(queue.popHead(), false);
+				//nextSong();
 			}
 			else {
 				// TODO: vote to delete song
@@ -164,6 +165,10 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		else if (s == delete_songs_btn) {
 			queue.deleteSelected();
 		}
+	}
+	
+	public void nextSong() {
+		if (queue.hasSongs()) controller.setSong(queue.getHead(), true);
 	}
 	
 //	public void setSongList(FSElement fs) {
