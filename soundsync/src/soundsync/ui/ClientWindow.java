@@ -36,7 +36,7 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 	private String user_id;
 	
 	public ClientWindow(String user_id, SoundSyncClient ssc) {
-		setTitle("Dorm Music Client");
+		setTitle("SoundSync Client");
 	
 		
 		this.user_id = user_id;

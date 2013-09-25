@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Timer;
 
@@ -211,7 +212,29 @@ public class SoundSyncServer implements Runnable {
 					}
 				}
 			}
-		});		
+		});
+		
+		frame.syncButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				sync();				
+			}
+		});
+	}
+	
+	private void sync(){
+		new Thread(){
+			@Override
+			public void run(){
+				frame.syncButton.setEnabled(false);
+				Collection<ClientHandler> clients = clientList.values();
+				
+				for(ClientHandler c:clients){
+					c.pingTest();
+				}
+				frame.syncButton.setEnabled(true);
+			}			
+		}.start();
 	}
 	
 	private void sendNextLoad() {
