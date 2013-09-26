@@ -16,6 +16,8 @@ public class ClientHandler {
 	private boolean loaded = false;
 	private boolean isRunning = false;
 	
+	private boolean pingTestFlag = false;
+	
 	public long ping;
 	public long lag;
 	
@@ -34,6 +36,11 @@ public class ClientHandler {
 					System.err.format("Connection error for client %s: %s%n", id, e);
 					disconnect();
 				}
+				
+				if(pingTestFlag) {
+					pingTest();
+				}
+				
 			}
 		}
 	};
@@ -140,6 +147,10 @@ public class ClientHandler {
 			disconnect();
 		}
 		
+	}
+	
+	public void flagPingTest(){
+		pingTestFlag = true;
 	}
 	
 	public boolean isLoaded() {

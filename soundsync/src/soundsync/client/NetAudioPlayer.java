@@ -90,6 +90,7 @@ public class NetAudioPlayer {
 	public boolean isMuted() {
 		return muted;
 	}
+
 	
 	public boolean loadSong(String loc) {
 		InputStream s = null;

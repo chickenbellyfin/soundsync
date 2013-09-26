@@ -150,7 +150,7 @@ public class SoundSyncClient {
 			}
 			
 			case Command.CLIENT_CLEAR_QUEUE:
-				mAudio.queue.clear();
+				mAudio.queue.clear();				
 				break;
 
 			case Command.CLIENT_ADD:  {
@@ -191,8 +191,7 @@ public class SoundSyncClient {
 //					
 //					mAudio.play();
 //				} else {
-					while (System.currentTimeMillis() < time)
-						;
+					while (System.currentTimeMillis() < time);
 					mAudio.play();
 				}
 			//}

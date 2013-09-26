@@ -37,7 +37,12 @@ public class SoundSyncServer implements Runnable {
 	
 	private long trackStartTime;
 	private long trackLength;
+	private long queueTime = 0;
+	private long trackStopTime = 0;
 	private int loadCount = 0;
+	
+	private boolean skip = false;
+	
 		
 	private boolean connecIsRunning = false;
 	private boolean playIsRunning = false;
@@ -52,38 +57,38 @@ public class SoundSyncServer implements Runnable {
 		@Override
 		public void run(){
 			playIsRunning = true;
-			long queueTime = 0;
-			long trackStopTime = 0;	
 			
 			while(playIsRunning){
 				
-				while(true){
+				while(!skip && System.currentTimeMillis() < queueTime){
 					try{
 						Thread.sleep(100);
-						if(System.currentTimeMillis() > queueTime){
-							break;
-						}
 					} catch(Exception e){}
-				}					
+				}			
 				
-				sendNextLoad();//TODO what to send???);
+				if(!skip) {
+					sendNextLoad();//TODO what to send???);
+				}
 				
-				while(true){
+				while(!skip && (System.currentTimeMillis() <= trackStopTime || loadCount < clientList.size())){
 					try{
 						Thread.sleep(50);
-						if(System.currentTimeMillis() >= trackStopTime && loadCount >= clientList.size()){
-							loadCount = 0;
-							break;
-						}
 					} catch (Exception e){}
 				}
+				loadCount = 0;
 				
 				trackStartTime = System.currentTimeMillis() + SoundSyncServer.PLAY_DELAY;
 				 trackStopTime = trackStartTime + trackLength;
 				queueTime = trackStopTime - 10*1000;
-				
-				sendPlay(trackStartTime);
-
+				if(skip){
+					queueTime = 0;
+					trackStopTime = 0;
+					skip = false;
+					frame.skipButton.setEnabled(true);
+					continue;
+				} else {
+					sendPlay(trackStartTime);
+				}
 			}			
 		}
 	};
@@ -182,8 +187,9 @@ public class SoundSyncServer implements Runnable {
 			@Override
 			public void actionPerformed(ActionEvent e){
 				broadcast(Command.formatCmd(Command.CLIENT_STOP, ""));
-				broadcast(Command.formatCmd(Command.CLIENT_CLEAR_QUEUE, ""));
-				
+				//broadcast(Command.formatCmd(Command.CLIENT_CLEAR_QUEUE, ""));
+				skip = true;	
+				frame.skipButton.setEnabled(false);
 			}
 		});
 		
@@ -222,7 +228,7 @@ public class SoundSyncServer implements Runnable {
 				Collection<ClientHandler> clients = clientList.values();
 				
 				for(ClientHandler c:clients){
-					c.pingTest();
+					c.flagPingTest();
 				}
 				frame.syncButton.setEnabled(true);
 			}			
@@ -253,14 +259,7 @@ public class SoundSyncServer implements Runnable {
 	
 	private void sendPlay(long trackStartTime) {
 		System.out.println("SERVER PLAY");
-		
-		broadcast(Command.formatCmd(Command.CLIENT_REMOVE, currentSong));
-		
-		try{
-			Thread.sleep(100);
-		}catch(Exception e){}
-		
-		
+				
 		currentSong = nextSong;
 		
 		for (ClientHandler h : clientList.values()) {
@@ -272,7 +271,9 @@ public class SoundSyncServer implements Runnable {
 			catch (Exception e) {
 				e.printStackTrace();
 			}
-		}	
+		}		
+
+		broadcast(Command.formatCmd(Command.CLIENT_REMOVE, currentSong));
 	}
 	
 	private void broadcast(final String b) {
