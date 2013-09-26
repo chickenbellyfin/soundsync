@@ -59,7 +59,8 @@ public class Indexer {
 				processedFileCount++;
 				monitor.setProgress(processedFileCount);
 				long remaining = ((System.currentTimeMillis()-startTime)/processedFileCount) * (fileCount-processedFileCount);
-				monitor.setNote(String.format("%d:%d remaining (%d/%d)", remaining/60, remaining%60, processedFileCount, fileCount));
+				remaining /= 1000;
+				monitor.setNote(String.format("%d:%d remaining (%d/%d)", (remaining/60), (remaining%60), processedFileCount, fileCount));
 				//monitor.setNote(processedFileCount+"/"+fileCount);
 				if(monitor.isCanceled()){
 					System.exit(0);

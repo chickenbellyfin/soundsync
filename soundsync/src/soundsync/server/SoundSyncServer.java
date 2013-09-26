@@ -255,6 +255,12 @@ public class SoundSyncServer implements Runnable {
 		System.out.println("SERVER PLAY");
 		
 		broadcast(Command.formatCmd(Command.CLIENT_REMOVE, currentSong));
+		
+		try{
+			Thread.sleep(100);
+		}catch(Exception e){}
+		
+		
 		currentSong = nextSong;
 		
 		for (ClientHandler h : clientList.values()) {
