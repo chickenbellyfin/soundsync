@@ -99,7 +99,7 @@ public class Indexer {
 	
 	private static URL makeURL(File f) {
 		try {
-			String p = f.getAbsolutePath().replaceAll("\\\\", "/"); // FIX
+			String p = f.getAbsolutePath().replaceAll("\\\\", "/"); // TODO: FIX
 			p = p.substring(p.indexOf('.') + 1);
 			return new URL("http://" + InetAddress.getLocalHost().getHostAddress() + p);
 		}
