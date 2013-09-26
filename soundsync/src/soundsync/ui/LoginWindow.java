@@ -10,7 +10,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,7 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import soundsync.Config;
 
 public class LoginWindow extends JFrame {
@@ -174,7 +172,10 @@ public class LoginWindow extends JFrame {
 			
 			@Override
 			public void windowClosed(WindowEvent e) {
-				if (start_client) ConnectingDialog.showDialog(addr_name.getText(), login_name.getText());
+				if (start_client) {
+					Config.SERVER_ADDR = addr_name.getText();
+					ConnectingDialog.showDialog(addr_name.getText(), login_name.getText());
+				}
 				else System.exit(0);
 			}
 		});

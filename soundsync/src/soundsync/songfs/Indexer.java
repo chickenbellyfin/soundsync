@@ -4,22 +4,22 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
-
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ProgressMonitor;
-
 import soundsync.Config;
 import soundsync.Song;
 import soundsync.ui.IndexerDialog;
-
 import com.mpatric.mp3agic.Mp3File;
 
 // akshay-computer (130.215.234.149)
 // dan-computer (130.215.234.145)
 
 public class Indexer {
+	
 	private static long startTime;
 	private static int fileCount = 0;
 	private static int processedFileCount = 0;
@@ -30,6 +30,7 @@ public class Indexer {
 	
 	private static FSElement getFile(File root, int depth) {
 		URL url = Indexer.makeURL(root);
+		System.out.println(url);
 		if (root.isFile()) {
 			if (Indexer.isMusicFile(root)) {
 				String title = "";
@@ -58,11 +59,11 @@ public class Indexer {
 				
 				processedFileCount++;
 				monitor.setProgress(processedFileCount);
-				long remaining = ((System.currentTimeMillis()-startTime)/processedFileCount) * (fileCount-processedFileCount);
+				long remaining = ((System.currentTimeMillis() - startTime) / processedFileCount) * (fileCount - processedFileCount);
 				remaining /= 1000;
-				monitor.setNote(String.format("%d:%d remaining (%d/%d)", (remaining/60), (remaining%60), processedFileCount, fileCount));
+				monitor.setNote(String.format("%d:%02d remaining (%d/%d)", (remaining / 60), (remaining % 60), processedFileCount, fileCount));
 				//monitor.setNote(processedFileCount+"/"+fileCount);
-				if(monitor.isCanceled()){
+				if (monitor.isCanceled()) {
 					System.exit(0);
 				}
 				
@@ -100,7 +101,7 @@ public class Indexer {
 		try {
 			String p = f.getAbsolutePath().replaceAll("\\\\", "/");
 			p = p.substring(p.indexOf('.') + 1);
-			return new URL("http://" + Config.SERVER_ADDR + p);
+			return new URL("http://" + InetAddress.getLocalHost().getHostAddress() + p);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -122,15 +123,14 @@ public class Indexer {
 	
 	public static File root;
 	
-	public static void showIndexerDialog(){
+	public static void showIndexerDialog() {
 		IndexerDialog dialog = new IndexerDialog(new JFrame(), true);
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
-		System.out.println("dialog closed");
-		if(dialog.ok){
-			root = new File(dialog.getSelectedRoot());			
+		if (dialog.ok) {
+			root = new File(dialog.getSelectedRoot());
 			fileCount = countFiles(root);
-
+			
 			monitor = new ProgressMonitor(new JFrame(), "Indexing MP3 files...", "Preparing...", 0, fileCount);
 			
 			new IndexerThread().start();
@@ -139,16 +139,18 @@ public class Indexer {
 	}
 	
 	static class IndexerThread extends Thread {
-		public void run(){			
+		
+		public void run() {
 			ObjectOutputStream out = null;
 			try {
-				out = new ObjectOutputStream(new FileOutputStream(new File("index")));
-			} catch (IOException e) {
+				out = new ObjectOutputStream(new FileOutputStream(new File(root.getAbsolutePath() + "\\index")));
+			}
+			catch (IOException e) {
 				e.printStackTrace();
 				System.exit(1);
 			}
 			
-			monitor.setNote(processedFileCount+"/"+fileCount);
+			monitor.setNote(processedFileCount + "/" + fileCount);
 			startTime = System.currentTimeMillis();
 			FSElement rootElement = Indexer.loadFileTree(root);
 			try {
@@ -162,16 +164,15 @@ public class Indexer {
 		}
 	}
 	
-	public static int countFiles(File root){
+	public static int countFiles(File root) {
 		int count = 0;
-		if(root.isDirectory()){
-			File[] children  = root.listFiles();
-			for(File c:children){
+		if (root.isDirectory()) {
+			File[] children = root.listFiles();
+			for (File c : children) {
 				count += countFiles(c);
 			}
-		} else if(root.getName().toLowerCase().endsWith("mp3")) {
-			return 1;
 		}
+		else if (root.getName().toLowerCase().endsWith("mp3")) { return 1; }
 		return count;
 	}
 }
