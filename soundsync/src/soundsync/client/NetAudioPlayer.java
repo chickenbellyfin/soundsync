@@ -119,7 +119,8 @@ public class NetAudioPlayer {
 			return true;
 		}
 		catch (Exception e) {
-			System.err.format("Error loading song: %s%n", e);
+			System.err.println("Error loading song:");
+			e.printStackTrace();
 		}
 		
 		if (s != null) try {

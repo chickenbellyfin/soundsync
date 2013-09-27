@@ -34,9 +34,17 @@ public class SoundSyncClient {
 	
 	private Thread mWindowUpdater = new Thread() {
 		
+		@Override
 		public void run() {
 			while (mIsRunning) {
-				win.controller.update((int)(mAudio.getTimeMillis()));
+				try {
+					long time = System.currentTimeMillis();
+					while (System.currentTimeMillis() - time < 100);
+					win.controller.update((int)(mAudio.getTimeMillis()));
+				}
+				catch (Exception e) {
+					
+				}
 			}
 		}
 	};
@@ -225,8 +233,8 @@ public class SoundSyncClient {
 	public void startInputProcessor() {
 		if (!mIsRunning) {
 			mIsRunning = true;
-			mInputProcessor.start();
 			mWindowUpdater.start();
+			mInputProcessor.start();
 		}
 	}
 	

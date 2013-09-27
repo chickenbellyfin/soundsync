@@ -177,12 +177,41 @@ public class SongController extends JPanel {
 			delete_btn.setText(isOwner() ? "X" : "(X)");
 			fwd_btn.setEnabled(isOwner());
 			scrubber.setEnabled(isOwner());
+			
+			setLabel(curr_song_name, song.getName());
+			String info = " ";
+			boolean artist = !song.getArtist().equals("Unknown Artist");
+			boolean album = !song.getAlbum().equals("Unknown Album");
+			if (artist) {
+				if (!album) info = song.getArtist();
+				else info = song.getArtist() + " - " + song.getAlbum();
+			}
+			else info = " ";
+			setLabel(curr_song_info, info);
 		}
 		else {
 			scrubber.setMaximum(0);
+			
+			curr_song_name.setText("<select a song>");
+			curr_song_info.setText(" ");
+		}
+		if (prev_song != null) {
+			setLabel(prev_song_info, prev_song.getInfo());
+		}
+		else {
+			prev_song_info.setText(" ");
 		}
 		
 		update(0);
+	}
+	
+	private void setLabel(JLabel label, String text) {
+		setLabel(label, text, this.getWidth(), false);
+	}
+	
+	private void setLabel(JLabel label, String text, int width, boolean clipped) {
+		if (label.getFontMetrics(label.getFont()).stringWidth(text + (clipped ? "..." : "")) > width) setLabel(label, text.substring(0, text.length() - 1), width, true);
+		else label.setText(text + (clipped ? "..." : ""));
 	}
 	
 	public void setMuted(boolean muted) {
@@ -196,29 +225,11 @@ public class SongController extends JPanel {
 			curr_time = time;
 			curr_time_label.setText(Song.formatTime(curr_time));
 			remaining_time_label.setText("-" + Song.formatTime(song.getLength() - curr_time));
-			curr_song_name.setText(song.getName());
-			String info = "";
-			boolean artist = !song.getArtist().equals("Unknown Artist");
-			boolean album = !song.getAlbum().equals("Unknown Album");
-			if (artist) {
-				if (!album) info = song.getArtist();
-				else info = song.getArtist() + " - " + song.getAlbum();
-			}
-			else info = "";
-			curr_song_info.setText(info);
 		}
 		else {
 			curr_time = 0;
 			curr_time_label.setText("--");
 			remaining_time_label.setText("--");
-			curr_song_name.setText("<select a song>");
-			curr_song_info.setText(" ");
-		}
-		if (prev_song != null) {
-			prev_song_info.setText(prev_song.getInfo());
-		}
-		else {
-			prev_song_info.setText(" ");
 		}
 		scrubber.setValue(curr_time);
 	}
