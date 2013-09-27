@@ -14,7 +14,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.BooleanControl;
 import javax.sound.sampled.Clip;
 
-
 /**
  * 
  * @author Akshay
@@ -29,9 +28,10 @@ public class NetAudioPlayer {
 	
 	public NetAudioPlayer() {
 		
-		try{
+		try {
 			//clip = AudioSystem.getClip();
-		} catch(Exception e){
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		queue = new ArrayList<Clip>();
@@ -66,8 +66,8 @@ public class NetAudioPlayer {
 		}
 	}
 	
-	public void setPan(long micro){
-		if(clip != null){
+	public void setPan(long micro) {
+		if (clip != null) {
 			clip.setMicrosecondPosition(micro);
 		}
 	}
@@ -90,7 +90,10 @@ public class NetAudioPlayer {
 	public boolean isMuted() {
 		return muted;
 	}
-
+	
+	public long getTimeMillis() {
+		return clip.getMicrosecondPosition() / 1000L;
+	}
 	
 	public boolean loadSong(String loc) {
 		InputStream s = null;
@@ -106,14 +109,14 @@ public class NetAudioPlayer {
 			AudioFormat baseFormat = audioStream.getFormat();
 			AudioFormat decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, baseFormat.getSampleRate(), 16, baseFormat.getChannels(), baseFormat.getChannels() * 2, baseFormat.getSampleRate(), false);
 			AudioInputStream audioStream2 = AudioSystem.getAudioInputStream(decodedFormat, audioStream);
-					
+			
 			Clip newClip = AudioSystem.getClip();
 			newClip.open(audioStream2);
 			
 			queue.add(newClip);
 			
 			System.out.format("Loaded (%dms)%n", System.currentTimeMillis() - sTime);
-			return true;			
+			return true;
 		}
 		catch (Exception e) {
 			System.err.format("Error loading song: %s%n", e);

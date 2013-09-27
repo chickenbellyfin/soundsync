@@ -116,11 +116,13 @@ public class SongSelectorDialog extends javax.swing.JDialog implements TreeSelec
 		TreePath[] paths = tree.getSelectionPaths();
 		selected = new ArrayList<FSElement>();
 		addButton.setEnabled(false);
-		for (TreePath p : paths) {
-			FSElement e = (FSElement)(((DefaultMutableTreeNode)p.getLastPathComponent()).getUserObject());
-			if (e.getChildren() == null) {
-				selected.add(e);
-				addButton.setEnabled(true);
+		if (paths != null) {
+			for (TreePath p : paths) {
+				FSElement e = (FSElement)(((DefaultMutableTreeNode)p.getLastPathComponent()).getUserObject());
+				if (e.getChildren() == null) {
+					selected.add(e);
+					addButton.setEnabled(true);
+				}
 			}
 		}
 	}
