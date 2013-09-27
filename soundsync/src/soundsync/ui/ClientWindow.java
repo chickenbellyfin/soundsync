@@ -29,7 +29,7 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 	private JLabel user_name;
 	public SongController controller;
 	public QueueList queue;
-	private JButton add_song_btn, delete_songs_btn;
+	private JButton addButton, removeButton;
 	
 	public FSElement songList;
 	
@@ -53,23 +53,23 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		user_name = new JLabel();
 		controller = new SongController(user_id, soundClient);
 		queue = new QueueList(user_id);
-		add_song_btn = new JButton();
-		delete_songs_btn = new JButton();		
+		addButton = new JButton();
+		removeButton = new JButton();		
 		user_name.setText("Logged in as: " + user_id);
 		user_name.setFont(new Font("Comic Sans MS", Font.PLAIN, 10));
 		
 		controller.rwd_btn.addActionListener(this);
 		controller.fwd_btn.addActionListener(this);
 		
-		controller.delete_btn.addActionListener(this);
+//		controller.delete_btn.addActionListener(this);
 		
-		add_song_btn.setText("add song...");
-		add_song_btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-		add_song_btn.addActionListener(this);
+		addButton.setText("Add song...");
+		addButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		addButton.addActionListener(this);
 		
-		delete_songs_btn.setText("delete songs");
-		delete_songs_btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-		delete_songs_btn.addActionListener(this);
+		removeButton.setText("Delete songs");
+		removeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		removeButton.addActionListener(this);
 		
 		getContentPane().setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -88,12 +88,12 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		c.weightx = 1;
 		c.gridwidth = 1;
 		c.anchor = GridBagConstraints.EAST;
-		getContentPane().add(add_song_btn, c);
+		getContentPane().add(addButton, c);
 		c.gridx = 1;
 		c.gridy = 3;
 		c.weightx = 1;
 		c.anchor = GridBagConstraints.WEST;
-		getContentPane().add(delete_songs_btn, c);
+		getContentPane().add(removeButton, c);
 		
 		addWindowListener(new WindowAdapter() {
 			
@@ -132,15 +132,7 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		else if (s == controller.fwd_btn) {
 			//nextSong();
 		}
-		else if (s == controller.delete_btn) {
-			if (controller.isOwner()) {
-				//nextSong();
-			}
-			else {
-				// TODO: vote to delete song
-			}
-		}
-		else if (s == add_song_btn) {
+		else if (s == addButton) {
 			URL[] song_urls = SongSelectorDialog.selectSong(songList);
 			System.out.format("Submitting URL%s:%n", song_urls.length > 1 ? "s" : "");
 			for (URL url : song_urls) {
@@ -148,8 +140,11 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 				System.out.format("\t%s%n", url);
 			}
 		}
-		else if (s == delete_songs_btn) {
-			//queue.deleteSelected();
+		else if (s == removeButton) {
+			int[] selected = queue.table.getSelectedRows();			
+			for(int i:selected){
+				soundClient.voteRemove(songList.find(queue.getSong(i)).url.toString());
+			}
 		}
 	}
 	

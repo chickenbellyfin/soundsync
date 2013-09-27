@@ -37,14 +37,11 @@ public class SoundSyncClient {
 		@Override
 		public void run() {
 			while (mIsRunning) {
-				try {
-					long time = System.currentTimeMillis();
-					while (System.currentTimeMillis() - time < 100);
-					win.controller.update((int)(mAudio.getTimeMillis()));
-				}
-				catch (Exception e) {
-					
-				}
+				try{
+					Thread.sleep(500);
+				}catch(Exception e){}
+				win.controller.update((int)(mAudio.getTimeMillis()));
+
 			}
 		}
 	};
@@ -132,8 +129,12 @@ public class SoundSyncClient {
 		sendServerMessage(Command.formatCmd(Command.SERVER_ADD, url));
 	}
 	
+	public void voteRemove(String url){
+		sendServerMessage(Command.formatCmd(Command.SERVER_REMOVE, url));
+	}
+	
 	private void doCommand(String s) {
-		System.out.format("Client %s processing command: \"%s\"%n", mId, s);
+		System.out.format("(%s) %s %n", mId, s);
 		String[] parts = s.split(Command.CMD_DELIM_REGEX);
 		
 		try {

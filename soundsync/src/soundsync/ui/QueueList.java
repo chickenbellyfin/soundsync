@@ -68,7 +68,7 @@ public class QueueList extends JPanel {
 	
 	String user_id;
 	
-	private JTable table;
+	public JTable table;
 	private JScrollPane scrollpane;
 	
 	private ArrayList<Song> songs;
@@ -101,6 +101,10 @@ public class QueueList extends JPanel {
 			songs.remove(song);
 			((SongQueueTableModel)table.getModel()).fireTableDataChanged();
 		}
+	}
+	
+	public Song getSong(int i){
+		return songs.get(i);
 	}
 	
 	public Song getHead() {

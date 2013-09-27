@@ -1,5 +1,6 @@
 package soundsync.server;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -7,6 +8,7 @@ import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,14 +24,16 @@ import soundsync.ui.ServerFrame;
  * @author Akshay
  */
 public class SoundSyncServer implements Runnable {
-		
+	
+	public static final int LOAD_TIME = 10*1000;
 	public static final int PLAY_DELAY = 500;
-	public static final int COL_URL = 1;
-	public static final int COL_USER = 2;
+	public static final int COL_URL = 0;
+	public static final int COL_USER = 1;
 	
 	private ServerSocket serverSocket;
 	private HashMap<String, ClientHandler> clientList;
-	
+	private HashMap<String, Integer> removeVotes;
+		
 	private ServerFrame frame;
 	
 	private DefaultTableModel songTable;
@@ -69,6 +73,8 @@ public class SoundSyncServer implements Runnable {
 					sendNextLoad();//TODO what to send???);
 				}
 				
+				frame.skipButton.setEnabled(false);
+				
 				while(!skip && (System.currentTimeMillis() <= trackStopTime || loadCount < clientList.size())){
 					try{
 						Thread.sleep(50);
@@ -78,7 +84,7 @@ public class SoundSyncServer implements Runnable {
 				
 				trackStartTime = System.currentTimeMillis() + SoundSyncServer.PLAY_DELAY;
 				 trackStopTime = trackStartTime + trackLength;
-				queueTime = trackStopTime - 10*1000;
+				queueTime = trackStopTime - LOAD_TIME;
 				if(skip){
 					queueTime = 0;
 					trackStopTime = 0;
@@ -88,8 +94,26 @@ public class SoundSyncServer implements Runnable {
 				} else {
 					sendPlay(trackStartTime);
 				}
+				
+				frame.skipButton.setEnabled(true);
+
 			}			
 		}
+	};
+	
+	private Thread timerThread = new Thread(){
+		@Override
+		public void run(){
+			while(true){
+				try{
+					Thread.sleep(200);
+					long left = Math.max(0, (trackStopTime - System.currentTimeMillis())/1000);
+					frame.timeLeft.setForeground(left*1000 < LOAD_TIME ? Color.RED : Color.BLACK);
+					
+					frame.timeLeft.setText(String.format("%d:%02d", left/60, left%60));
+				} catch(Exception e){}
+			}
+		}		
 	};
 	
 	public SoundSyncServer() {
@@ -106,7 +130,7 @@ public class SoundSyncServer implements Runnable {
 		setupGUI();
 		
 		clientList = new HashMap<String, ClientHandler>();
-		
+		removeVotes = new HashMap<String, Integer>();
 	}
 	
 	/**
@@ -130,7 +154,7 @@ public class SoundSyncServer implements Runnable {
 					tmpOut.writeUTF(Command.GOOD);
 				}
 				else {
-					System.out.printf("%s is had outdated client (user: %d, current:%s)", user, userVersion, Command.PROTOCOL_VERSION);
+					System.out.printf("%s had outdated client (user: %d, current:%s)", user, userVersion, Command.PROTOCOL_VERSION);
 					tmpOut.writeUTF(Command.BAD);
 				}
 				tmpOut.flush();
@@ -179,6 +203,9 @@ public class SoundSyncServer implements Runnable {
 				} else {
 					//TODO: skip the song
 				}
+
+				timerThread.start();
+				frame.playButton.setEnabled(false);
 			}
 		});
 		
@@ -200,13 +227,9 @@ public class SoundSyncServer implements Runnable {
 				for(int i:selected){
 					urls.add((String)songTable.getValueAt(i, COL_URL));
 				}
+				
 				for (String url:urls) {
-					for(int j = 0; j < songTable.getRowCount(); j++){
-						if(url.equals(songTable.getValueAt(j, COL_URL))){
-							songTable.removeRow(j);			
-						}
-						broadcast(Command.formatCmd(Command.CLIENT_REMOVE, url));
-					}
+					removeSong(url);
 				}
 			}
 		});
@@ -217,6 +240,7 @@ public class SoundSyncServer implements Runnable {
 				sync();				
 			}
 		});
+		
 	}
 	
 	private void sync(){
@@ -233,6 +257,35 @@ public class SoundSyncServer implements Runnable {
 			}			
 		}.start();
 	}
+	
+	public void voteRemoveSong(String id, String url){
+		for(int j = 0; j < songTable.getRowCount(); j++){
+			if(url.equals(songTable.getValueAt(j, COL_URL))){
+				if(id.equals(songTable.getValueAt(j, COL_USER))){					
+					removeSong(url);
+				} else {					
+//					if(!removeVotes.containsKey(url)){
+//						removeVotes.put(url, 0);					
+//					}					
+					removeVotes.put(url, removeVotes.get(url)+1);					
+					if(removeVotes.get(url) >= clientList.size()/2){
+						removeSong(url);
+					}
+				}				
+			}
+		}		
+	}
+	
+	public void removeSong(String url){
+		for(int j = 0; j < songTable.getRowCount(); j++){
+			if(url.equals(songTable.getValueAt(j, COL_URL))){
+				removeVotes.remove(url);
+				songTable.removeRow(j);	
+				broadcast(Command.formatCmd(Command.CLIENT_REMOVE, url));
+			}
+		}				
+	}
+
 	
 	private void sendNextLoad() {
 		new Thread(new Runnable() {			
@@ -256,11 +309,9 @@ public class SoundSyncServer implements Runnable {
 		}).start();
 	}
 	
-	private void sendPlay(long trackStartTime) {
-		System.out.println("SERVER PLAY");
-				
+	private void sendPlay(long trackStartTime) {				
 		currentSong = nextSong;
-		
+		frame.currentSong.setText(currentSong.substring(currentSong.lastIndexOf("/")+1, currentSong.lastIndexOf(".")));
 		for (ClientHandler h : clientList.values()) {
 			try {
 				if (h.isLoaded()) {
@@ -297,8 +348,9 @@ public class SoundSyncServer implements Runnable {
 				return;
 			}
 		}
-		songTable.addRow(new Object[] { "", song, user });
-		frame.adjuster.adjustColumns();
+		songTable.addRow(new Object[] {song, user });
+		//frame.adjuster.adjustColumns();
+		songTable.fireTableDataChanged();
 		frame.repaint();		
 		broadcast(Command.formatCmd(Command.CLIENT_ADD, user, song));
 	}

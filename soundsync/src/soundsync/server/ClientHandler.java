@@ -33,7 +33,7 @@ public class ClientHandler {
 					doCommand(cmd);
 				}
 				catch (IOException e) {
-					System.err.format("Connection error for client %s: %s%n", id, e);
+					System.err.format("[%s] DISCONNECT : %s %n", id, e);
 					disconnect();
 				}
 				
@@ -57,7 +57,7 @@ public class ClientHandler {
 	}
 	
 	public void doCommand(String s) {
-		System.out.format("Client %s processing command: \"%s\"%n", id, s);
+		System.out.format("[%s] %s %n", id, s);
 
 		String[] parts = s.split(Command.CMD_DELIM_REGEX);
 
@@ -73,16 +73,25 @@ public class ClientHandler {
 					}
 					server.clientLoaded();
 					break;
-				case Command.SERVER_ADD:
+				case Command.SERVER_ADD: {
 					String url = "";
 					for (int i = 1; i < parts.length; i++)
 						url += parts[i];
 					submitSong(url);
 					break;
+				}
+					
+				case Command.SERVER_REMOVE: {
+					String url = "";
+					for (int i = 1; i < parts.length; i++)
+						url += parts[i];
+					removeSong(url);
+					break;
+				}
 			}
 		}
 		catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-			System.err.format("Client %s: Error parsing command \"%s\": %s%n", id, s, e);
+			System.err.format("[%s] ERR: \"%s\": %s%n", id, s, e);
 		}
 	}
 	
@@ -117,13 +126,10 @@ public class ClientHandler {
 		}
 		
 		ping = totalPing / tests;
-		System.out.format("Client %s ping: %d%n", id, ping);
 		
 		try {
 			send(Command.CLIENT_TIME);
 			lag = System.currentTimeMillis() - (Long.parseLong(in.readUTF()) + ping / 2);
-
-			System.out.format("Client %s lag: %d%n", id, lag);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -132,13 +138,12 @@ public class ClientHandler {
 	
 	public void sendLoad(String url) {
 		loaded = false;
-		System.out.println("sendi "+url);
 		send(Command.formatCmd(Command.CLIENT_LOAD, url));
 	}
 	
 	public void send(String msg) {
 		try {
-			System.out.format("Sending \"%s\" to client %s%n", msg, id);
+			System.out.format("[%s]-> %s %n", id, msg);
 			out.writeUTF(msg);
 			out.flush();
 		}
@@ -171,6 +176,10 @@ public class ClientHandler {
 	
 	private void submitSong(String loc) {
 		server.addSong(loc, id);
+	}
+	
+	private void removeSong(String url){
+		server.voteRemoveSong(id, url);
 	}
 	
 	private void disconnect() {

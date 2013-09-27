@@ -12,7 +12,7 @@ public class FSElement implements Serializable {
 	private static final long serialVersionUID = 4281554220143405377L;
 
 	private String name;
-	private URL url;
+	public URL url;
 
 	private Song song;
 
@@ -60,6 +60,23 @@ public class FSElement implements Serializable {
 			for (FSElement e : children) {
 				FSElement tmp;
 				if ((tmp = e.find(url)) != null) {
+					return tmp;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public FSElement find(Song song){
+		if(this.song == song){
+			return this;
+		} else {
+			if(children == null){
+				return null;
+			}
+			for (FSElement e : children) {
+				FSElement tmp;
+				if ((tmp = e.find(song)) != null) {
 					return tmp;
 				}
 			}

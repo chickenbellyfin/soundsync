@@ -92,6 +92,7 @@ public class NetAudioPlayer {
 	}
 	
 	public long getTimeMillis() {
+		if(clip == null)return 0L;
 		return clip.getMicrosecondPosition() / 1000L;
 	}
 	

@@ -29,7 +29,7 @@ public class SongController extends JPanel {
 	JLabel prev_song_info;
 	JLabel curr_song_name;
 	JLabel curr_song_info;
-	JButton delete_btn, download_btn;
+//	JButton delete_btn, download_btn;
 	JButton rwd_btn, play_btn, fwd_btn;
 	JLabel curr_time_label, remaining_time_label;
 	JSlider scrubber;
@@ -47,8 +47,8 @@ public class SongController extends JPanel {
 		prev_song_info = new JLabel();
 		curr_song_name = new JLabel();
 		curr_song_info = new JLabel();
-		delete_btn = new JButton();
-		download_btn = new JButton();
+//		delete_btn = new JButton();
+//		download_btn = new JButton();
 		rwd_btn = new JButton();
 		play_btn = new JButton();
 		fwd_btn = new JButton();
@@ -66,16 +66,16 @@ public class SongController extends JPanel {
 		play_btn.setText(">");
 		fwd_btn.setText(">>");
 		
-		delete_btn.setText("X");
-		
-		download_btn.setText("<3");
-		download_btn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				downloadSong();
-			}
-		});
+//		delete_btn.setText("X");
+//		
+//		download_btn.setText("<3");
+//		download_btn.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				downloadSong();
+//			}
+//		});
 		
 		setSong(null, false);
 		scrubber.setPreferredSize(new Dimension(300, scrubber.getPreferredSize().height));
@@ -113,9 +113,9 @@ public class SongController extends JPanel {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.anchor = GridBagConstraints.CENTER;
-		options_panel.add(delete_btn, c);
+//		options_panel.add(delete_btn, c);
 		c.gridx = 1;
-		options_panel.add(download_btn, c);
+//		options_panel.add(download_btn, c);
 		
 		c = new GridBagConstraints();
 		controls_panel = new JPanel();
@@ -174,7 +174,7 @@ public class SongController extends JPanel {
 			scrubber.setMaximum((int)song.getLength());
 			rwd_btn.setEnabled(isOwner());
 			play_btn.setEnabled(isOwner());
-			delete_btn.setText(isOwner() ? "X" : "(X)");
+//			delete_btn.setText(isOwner() ? "X" : "(X)");
 			fwd_btn.setEnabled(isOwner());
 			scrubber.setEnabled(isOwner());
 			

@@ -17,6 +17,7 @@ public class Command {
 	
 	public static final String SERVER_READY = "READY";
 	public static final String SERVER_ADD = "ADD";
+	public static final String SERVER_REMOVE = "DEL";
 	
 	public static final String PING = "PING";
 	public static final String GOOD = "GOOD";
