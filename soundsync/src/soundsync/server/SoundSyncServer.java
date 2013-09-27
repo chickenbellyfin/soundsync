@@ -19,7 +19,6 @@ import soundsync.ui.ServerFrame;
 
 
 /**
- * 
  * @author Akshay
  */
 public class SoundSyncServer implements Runnable {
