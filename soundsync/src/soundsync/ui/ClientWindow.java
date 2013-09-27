@@ -149,7 +149,7 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 			}
 		}
 		else if (s == delete_songs_btn) {
-			queue.deleteSelected();
+			//queue.deleteSelected();
 		}
 	}
 	

@@ -171,7 +171,7 @@ public class SongController extends JPanel {
 		this.song = song;
 		
 		if (song != null) {
-			scrubber.setMaximum((int) song.getLength());
+			scrubber.setMaximum((int)song.getLength());
 			rwd_btn.setEnabled(isOwner());
 			play_btn.setEnabled(isOwner());
 			delete_btn.setText(isOwner() ? "X" : "(X)");
@@ -197,7 +197,15 @@ public class SongController extends JPanel {
 			curr_time_label.setText(Song.formatTime(curr_time));
 			remaining_time_label.setText("-" + Song.formatTime(song.getLength() - curr_time));
 			curr_song_name.setText(song.getName());
-			curr_song_info.setText(song.getArtist() + " - " + song.getAlbum());
+			String info = "";
+			boolean artist = !song.getArtist().equals("Unknown Artist");
+			boolean album = !song.getAlbum().equals("Unknown Album");
+			if (artist) {
+				if (!album) info = song.getArtist();
+				else info = song.getArtist() + " - " + song.getAlbum();
+			}
+			else info = "";
+			curr_song_info.setText(info);
 		}
 		else {
 			curr_time = 0;

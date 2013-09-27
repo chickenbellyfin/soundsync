@@ -205,7 +205,6 @@ public class SoundSyncClient {
 //				} else {
 				while (System.currentTimeMillis() < time);
 				mAudio.play();
-				mWindowUpdater.start();
 			}
 			//}
 		}).start();
@@ -227,6 +226,7 @@ public class SoundSyncClient {
 		if (!mIsRunning) {
 			mIsRunning = true;
 			mInputProcessor.start();
+			mWindowUpdater.start();
 		}
 	}
 	
