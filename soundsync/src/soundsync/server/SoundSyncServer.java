@@ -230,6 +230,7 @@ public class SoundSyncServer implements Runnable {
 				for (String url:urls) {
 					removeSong(url);
 				}
+				broadcast(Command.format(Command.CLIENT_REMOVE, urls.toArray()));
 			}
 		});
 		
