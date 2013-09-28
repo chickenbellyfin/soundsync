@@ -46,7 +46,7 @@ public class SoundSyncServer implements Runnable {
 	private boolean skip = false;
 	
 		
-	private boolean connecIsRunning = false;
+	private boolean connectIsRunning = false;
 	private boolean playIsRunning = false;
 
 	private String currentSong = "";
@@ -137,9 +137,9 @@ public class SoundSyncServer implements Runnable {
 	 */
 	@Override
 	public void run() {
-		connecIsRunning = true;
+		connectIsRunning = true;
 		
-		while (connecIsRunning) {
+		while (connectIsRunning) {
 			try {
 				Socket newClient = serverSocket.accept();
 				newClient.setSoTimeout(0);
@@ -257,11 +257,12 @@ public class SoundSyncServer implements Runnable {
 		}.start();
 	}
 	
-	public void voteRemoveSong(String id, String url){
+	public boolean voteRemoveSong(String id, String url){
 		for(int j = 0; j < songTable.getRowCount(); j++){
 			if(url.equals(songTable.getValueAt(j, COL_URL))){
 				if(id.equals(songTable.getValueAt(j, COL_USER))){					
 					removeSong(url);
+					return true;
 				} else {					
 					if(!removeVotes.containsKey(url)){
 						removeVotes.put(url, 0);					
@@ -269,10 +270,12 @@ public class SoundSyncServer implements Runnable {
 					removeVotes.put(url, removeVotes.get(url)+1);					
 					if(removeVotes.get(url) >= (clientList.size()/2)+1){
 						removeSong(url);
+						return true;
 					}
 				}				
 			}
-		}		
+		}
+		return false;
 	}
 	
 	public void removeSong(String url){
@@ -280,7 +283,6 @@ public class SoundSyncServer implements Runnable {
 			if(url.equals(songTable.getValueAt(j, COL_URL))){
 				removeVotes.remove(url);
 				songTable.removeRow(j);	
-				broadcast(Command.format(Command.CLIENT_REMOVE, url));
 			}
 		}				
 	}
@@ -325,7 +327,7 @@ public class SoundSyncServer implements Runnable {
 		broadcast(Command.format(Command.CLIENT_REMOVE, currentSong));
 	}
 	
-	private void broadcast(final String b) {
+	public void broadcast(final String b) {
 		new Thread(new Runnable() {			
 			@Override
 			public void run() {
@@ -341,17 +343,17 @@ public class SoundSyncServer implements Runnable {
 		}).start();
 	}
 	
-	public void addSong(String song, String user) {
+	public boolean addSong(String song, String user) {
 		for (int i = 0; i < songTable.getRowCount(); i++) {
 			if (songTable.getValueAt(i, SoundSyncServer.COL_URL).equals(song)) { //song is already in the list
-				return;
+				return false;
 			}
 		}
 		songTable.addRow(new Object[] {song, user });
 		//frame.adjuster.adjustColumns();
 		songTable.fireTableDataChanged();
 		frame.repaint();		
-		broadcast(Command.format(Command.CLIENT_ADD, user, song));
+		return true;
 	}
 	
 	public void removeClient(ClientHandler h) {

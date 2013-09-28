@@ -6,11 +6,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.concurrent.ExecutionException;
+
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
+
 import soundsync.client.SoundSyncClient;
 
 public class ConnectingDialog extends JDialog {
@@ -25,6 +28,7 @@ public class ConnectingDialog extends JDialog {
 				public SoundSyncClient doInBackground() {
 					SoundSyncClient ssc = new SoundSyncClient();
 					ssc.connect(addr, username); //comment out this line if server isnt't up...will also cause other errors
+					
 					return ssc;
 				}
 				
@@ -32,13 +36,13 @@ public class ConnectingDialog extends JDialog {
 				public void done() {
 					try {
 						SoundSyncClient client = get();
-						new ClientWindow(username, client);
+						client.startInputProcessor();
 						ConnectingDialog.dialog.connected = true;
 						ConnectingDialog.dialog.dispose();
 						ConnectingDialog.dialog = null;
 					}
 					catch (InterruptedException ignore) {}
-					catch (java.util.concurrent.ExecutionException e) {
+					catch (ExecutionException e) {
 						String why = null;
 						Throwable cause = e.getCause();
 						if (cause != null) {

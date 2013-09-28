@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import soundsync.Command;
 import soundsync.Config;
@@ -76,16 +77,27 @@ public class ClientHandler {
 				server.clientLoaded();
 				break;
 			case Command.SERVER_ADD: {
+				ArrayList<String> added = new ArrayList<String>();
+				added.add(id);
 				for (int i = 1; i < parts.length; i++) {
-					submitSong(parts[i]);
+					if(submitSong(parts[i])) {
+						added.add(parts[i]);
+					}
 				}
+
+				server.broadcast(Command.format(Command.CLIENT_ADD, added.toArray()));
 				break;
 			}
 				
 			case Command.SERVER_REMOVE: {
+				ArrayList<String> removed = new ArrayList<String>();
 				for (int i = 1; i < parts.length; i++) {
-					removeSong(parts[i]);
+					if(removeSong(parts[i])){
+						removed.add(parts[i]);
+					}
 				}
+
+				server.broadcast(Command.format(Command.CLIENT_REMOVE, removed.toArray()));
 				break;
 			}
 		}
@@ -167,12 +179,12 @@ public class ClientHandler {
 		}
 	}
 	
-	private void submitSong(String loc) {
-		server.addSong(loc, id);
+	private boolean submitSong(String loc) {
+		return server.addSong(loc, id);
 	}
 	
-	private void removeSong(String url){
-		server.voteRemoveSong(id, url);
+	private boolean removeSong(String url){
+		return server.voteRemoveSong(id, url);
 	}
 	
 	private void disconnect() {

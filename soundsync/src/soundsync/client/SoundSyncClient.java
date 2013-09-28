@@ -1,15 +1,22 @@
 package soundsync.client;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.URL;
 
 import soundsync.Command;
 import soundsync.Config;
 import soundsync.Song;
-import soundsync.ui.ClientWindow;
+import soundsync.songfs.FSElement;
+import soundsync.ui.ClientFrame;
+import soundsync.ui.SongQueueTableModel;
+import soundsync.ui.SongSelectorDialog;
 
 /**
  * 
@@ -17,14 +24,13 @@ import soundsync.ui.ClientWindow;
  */
 public class SoundSyncClient {
 	
-	public interface SyncClientListener {
-		
-		public void songAdded(String user, String url);
-		
-		public void syncDisconnected();
-	}
 	
-	public ClientWindow win;
+	//public ClientWindow win;
+	
+	private ClientFrame mFrame;
+	private SongQueueTableModel mQueue;
+	private FSElement mSongIndex;
+	
 	public NetAudioPlayer mAudio;
 	private String mId;
 	private Socket mServer;
@@ -32,9 +38,10 @@ public class SoundSyncClient {
 	private DataOutputStream out;
 	private boolean mIsRunning;
 	
-	private SyncClientListener mListener;
+	private String mNextSong;
 	
-	private Thread mWindowUpdater = new Thread() {
+	
+	private Thread mTimeUpdater = new Thread() {
 		
 		@Override
 		public void run() {
@@ -42,7 +49,7 @@ public class SoundSyncClient {
 				try{
 					Thread.sleep(500);
 				}catch(Exception e){}
-				win.controller.update((int)(mAudio.getTimeMillis()));
+				mFrame.updateTime((int)(mAudio.getTimeMillis()));
 
 			}
 		}
@@ -66,15 +73,53 @@ public class SoundSyncClient {
 		}
 	};
 	
-	// private Runnable outputProcessor = new Runnable() {
-	// @Override
-	// public void run() {
-	// }
-	// };
-	public SoundSyncClient() {
-		win = null;
+
+	public SoundSyncClient() {		
 		mAudio = new NetAudioPlayer();
+		
+		try {
+			InputStream remoteIS = new URL("http://" + Config.SERVER_ADDR + "/index").openStream();
+			
+			ObjectInputStream ois = new ObjectInputStream(remoteIS);
+			
+			mSongIndex = (FSElement)(ois.readObject());
+//			mInputProcessor.start();
+//			mTimeUpdater.start();
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		setupGUI();
 	}
+	
+	private void setupGUI() {
+		mFrame = new ClientFrame();
+		mQueue = new SongQueueTableModel();
+		mFrame.songTable.setModel(mQueue);
+
+		mFrame.addButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				URL[] song_urls = SongSelectorDialog.selectSong(mSongIndex);
+				System.out.format("Submitting URL%s:%n",
+						song_urls.length > 1 ? "s" : "");
+				submitSong(song_urls);
+			}
+		});
+
+		mFrame.removeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int[] selected = mFrame.songTable.getSelectedRows();
+				URL[] songsToRemove = new URL[selected.length];
+				for (int i = 0; i < selected.length; i++) {
+					songsToRemove[i] = mSongIndex.find(mQueue.getSong(selected[i])).url;
+				}
+				voteRemove(songsToRemove);
+			}
+		});
+	}	
+	
 	
 	public boolean connect(String serverAddr, String user) {
 		mId = user;
@@ -155,7 +200,8 @@ public class SoundSyncClient {
 				case Command.CLIENT_PLAY:
 					long startTime = Long.parseLong(parts[1]);
 					playAt(startTime);
-					win.nextSong();
+					mFrame.setSong(mSongIndex.find(mNextSong).getSong());
+					//win.nextSong(); TODO: fix this line
 					break;
 				
 				case Command.CLIENT_STOP:
@@ -163,11 +209,11 @@ public class SoundSyncClient {
 					break;
 				
 				case Command.CLIENT_LOAD: {
-					String url = "";
+					mNextSong = "";
 					for (int i = 1; i < parts.length; i++)
-						url += parts[i];
-					boolean loaded = mAudio.loadSong(url);
-					long time = win.songList.find(url).getSong().getLength();
+						mNextSong += parts[i];
+					boolean loaded = mAudio.loadSong(mNextSong);
+					long time = mSongIndex.find(mNextSong).getSong().getLength();
 					sendServerMessage(Command.format(Command.SERVER_READY, (loaded ? time : -1)));
 					break;
 				}
@@ -177,21 +223,19 @@ public class SoundSyncClient {
 					break;
 				
 				case Command.CLIENT_ADD: {
-					String url = "";
-					for (int i = 2; i < parts.length; i++)
-						url += parts[i];
-					Song song = win.songList.find(url).getSong();
-					song.setOwner(parts[1]);
-					win.queue.addSong(song);
+					for (int i = 2; i < parts.length; i++){
+						Song song = mSongIndex.find(parts[i]).getSong();
+						song.setOwner(parts[1]);
+						mQueue.addSong(song);
+					}
 					break;
 				}
 				
 				case Command.CLIENT_REMOVE: {
-					String url = "";
-					for (int i = 1; i < parts.length; i++)
-						url += parts[i];
-					Song song = win.songList.find(url).getSong();
-					win.queue.removeSong(song);
+					for (int i = 1; i < parts.length; i++){
+						Song song = mSongIndex.find(parts[i]).getSong();
+						mQueue.removeSong(song);
+					}
 					break;
 				}
 				
@@ -236,7 +280,7 @@ public class SoundSyncClient {
 	public void startInputProcessor() {
 		if (!mIsRunning) {
 			mIsRunning = true;
-			mWindowUpdater.start();
+			mTimeUpdater.start();
 			mInputProcessor.start();
 		}
 	}
@@ -250,9 +294,6 @@ public class SoundSyncClient {
 			e.printStackTrace();
 		}
 		
-		if (mListener != null) {
-			mListener.syncDisconnected();
-		}
 		
 	}
 }
