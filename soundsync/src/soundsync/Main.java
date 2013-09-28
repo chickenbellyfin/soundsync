@@ -69,9 +69,7 @@ public class Main {
 		} else {
 			JOptionPane.showMessageDialog(new JFrame(), "You don't need this.");
 			launcher.indexButton.setEnabled(false);			
-		}
-		
-		
+		}		
 	}
 
 	

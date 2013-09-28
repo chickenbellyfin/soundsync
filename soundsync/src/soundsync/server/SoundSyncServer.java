@@ -8,7 +8,6 @@ import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -162,11 +161,11 @@ public class SoundSyncServer implements Runnable {
 				ClientHandler newClientHandler = new ClientHandler(user, newClient, this);
 				//String newClientAddr = newClient.getInetAddress().getHostAddress();
 				clientList.put(user, newClientHandler);
-				newClientHandler.pingTest();
+				newClientHandler.clockOffsetTest();
 				
 				//add the songs that are already in the queue
 				for(int i = 0; i < songTable.getRowCount(); i++){
-					newClientHandler.send(Command.formatCmd(Command.CLIENT_ADD, songTable.getValueAt(i, COL_USER), songTable.getValueAt(i, COL_URL)));
+					newClientHandler.send(Command.format(Command.CLIENT_ADD, songTable.getValueAt(i, COL_USER), songTable.getValueAt(i, COL_URL)));
 				}
 				
 				newClientHandler.start();
@@ -212,7 +211,7 @@ public class SoundSyncServer implements Runnable {
 		frame.skipButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
-				broadcast(Command.formatCmd(Command.CLIENT_STOP, ""));
+				broadcast(Command.format(Command.CLIENT_STOP, ""));
 				//broadcast(Command.formatCmd(Command.CLIENT_CLEAR_QUEUE, ""));
 				skip = true;	
 				frame.skipButton.setEnabled(false);
@@ -264,11 +263,11 @@ public class SoundSyncServer implements Runnable {
 				if(id.equals(songTable.getValueAt(j, COL_USER))){					
 					removeSong(url);
 				} else {					
-//					if(!removeVotes.containsKey(url)){
-//						removeVotes.put(url, 0);					
-//					}					
+					if(!removeVotes.containsKey(url)){
+						removeVotes.put(url, 0);					
+					}					
 					removeVotes.put(url, removeVotes.get(url)+1);					
-					if(removeVotes.get(url) >= clientList.size()/2){
+					if(removeVotes.get(url) >= (clientList.size()/2)+1){
 						removeSong(url);
 					}
 				}				
@@ -281,7 +280,7 @@ public class SoundSyncServer implements Runnable {
 			if(url.equals(songTable.getValueAt(j, COL_URL))){
 				removeVotes.remove(url);
 				songTable.removeRow(j);	
-				broadcast(Command.formatCmd(Command.CLIENT_REMOVE, url));
+				broadcast(Command.format(Command.CLIENT_REMOVE, url));
 			}
 		}				
 	}
@@ -315,7 +314,7 @@ public class SoundSyncServer implements Runnable {
 		for (ClientHandler h : clientList.values()) {
 			try {
 				if (h.isLoaded()) {
-					h.send(Command.formatCmd(Command.CLIENT_PLAY, trackStartTime - h.lag));
+					h.send(Command.format(Command.CLIENT_PLAY, trackStartTime - h.clockOffset));
 				}
 			}
 			catch (Exception e) {
@@ -323,7 +322,7 @@ public class SoundSyncServer implements Runnable {
 			}
 		}		
 
-		broadcast(Command.formatCmd(Command.CLIENT_REMOVE, currentSong));
+		broadcast(Command.format(Command.CLIENT_REMOVE, currentSong));
 	}
 	
 	private void broadcast(final String b) {
@@ -352,7 +351,7 @@ public class SoundSyncServer implements Runnable {
 		//frame.adjuster.adjustColumns();
 		songTable.fireTableDataChanged();
 		frame.repaint();		
-		broadcast(Command.formatCmd(Command.CLIENT_ADD, user, song));
+		broadcast(Command.format(Command.CLIENT_ADD, user, song));
 	}
 	
 	public void removeClient(ClientHandler h) {

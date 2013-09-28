@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URL;
+
 import soundsync.Command;
 import soundsync.Config;
 import soundsync.Song;
@@ -125,12 +127,12 @@ public class SoundSyncClient {
 		return connected;
 	}
 	
-	public void submitSong(String url) {
-		sendServerMessage(Command.formatCmd(Command.SERVER_ADD, url));
+	public void submitSong(URL[] url) {
+		sendServerMessage(Command.format(Command.SERVER_ADD, (Object[])url));
 	}
 	
-	public void voteRemove(String url){
-		sendServerMessage(Command.formatCmd(Command.SERVER_REMOVE, url));
+	public void voteRemove(URL[] url){
+		sendServerMessage(Command.format(Command.SERVER_REMOVE, (Object[])url));
 	}
 	
 	private void doCommand(String s) {
@@ -166,7 +168,7 @@ public class SoundSyncClient {
 						url += parts[i];
 					boolean loaded = mAudio.loadSong(url);
 					long time = win.songList.find(url).getSong().getLength();
-					sendServerMessage(Command.formatCmd(Command.SERVER_READY, (loaded ? time : -1)));
+					sendServerMessage(Command.format(Command.SERVER_READY, (loaded ? time : -1)));
 					break;
 				}
 				

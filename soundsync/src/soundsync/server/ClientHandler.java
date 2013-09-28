@@ -4,10 +4,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+
 import soundsync.Command;
+import soundsync.Config;
 
 public class ClientHandler {
 
+	
 	public String id;
 	private SoundSyncServer server;
 	private Socket socket;
@@ -18,8 +21,7 @@ public class ClientHandler {
 	
 	private boolean pingTestFlag = false;
 	
-	public long ping;
-	public long lag;
+	public long clockOffset;
 	
 	// TODO: have window with tabs for each client's output and client-specific commands
 	
@@ -33,12 +35,13 @@ public class ClientHandler {
 					doCommand(cmd);
 				}
 				catch (IOException e) {
+					e.printStackTrace();
 					System.err.format("[%s] DISCONNECT : %s %n", id, e);
 					disconnect();
 				}
 				
 				if(pingTestFlag) {
-					pingTest();
+					clockOffsetTest();
 				}
 				
 			}
@@ -56,66 +59,60 @@ public class ClientHandler {
 		this.out = new DataOutputStream(socket.getOutputStream());
 	}
 	
-	public void doCommand(String s) {
+	private void doCommand(String s) {
 		System.out.format("[%s] %s %n", id, s);
 
 		String[] parts = s.split(Command.CMD_DELIM_REGEX);
 
-		try {
-			String cmd = parts[0];
+		String cmd = parts[0];
 			
-			switch (cmd) {
-				case Command.SERVER_READY:
-					long trackTimeMillis = Long.parseLong(parts[1]);
-					if (trackTimeMillis > 0) {
-						loaded = true;
-						server.setTrackLength(trackTimeMillis);
-					}
-					server.clientLoaded();
-					break;
-				case Command.SERVER_ADD: {
-					String url = "";
-					for (int i = 1; i < parts.length; i++)
-						url += parts[i];
-					submitSong(url);
-					break;
+		switch (cmd) {
+			case Command.SERVER_READY:
+				long trackTimeMillis = Long.parseLong(parts[1]);
+				if (trackTimeMillis > 0) {
+					loaded = true;
+					server.setTrackLength(trackTimeMillis);
 				}
-					
-				case Command.SERVER_REMOVE: {
-					String url = "";
-					for (int i = 1; i < parts.length; i++)
-						url += parts[i];
-					removeSong(url);
-					break;
+				server.clientLoaded();
+				break;
+			case Command.SERVER_ADD: {
+				for (int i = 1; i < parts.length; i++) {
+					submitSong(parts[i]);
 				}
+				break;
+			}
+				
+			case Command.SERVER_REMOVE: {
+				for (int i = 1; i < parts.length; i++) {
+					removeSong(parts[i]);
+				}
+				break;
 			}
 		}
-		catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-			System.err.format("[%s] ERR: \"%s\": %s%n", id, s, e);
-		}
+		
 	}
 	
-	public void pingTest() {
-		int tests = 100;
+	public void clockOffsetTest() {
 		
 		long totalPing = 0;
+		long ping = 0;
 		
-		for (int i = 0; i < 10; i++) {
-			try {
-				send(Command.PING);
-
-				in.readUTF();
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				disconnect();
-			}
-		}
+//		for (int i = 0; i < 10; i++) {
+//			try {
+//				send(Command.PING);
+//
+//				in.readUTF();
+//			}
+//			catch (Exception e) {
+//				e.printStackTrace();
+//				disconnect();
+//			}
+//		}
 		
-		for (int i = 0; i < tests; i++) {
+		for (int i = 0; i < Config.LAG_TEST_COUNT; i++) {
 			try {
-				send(Command.PING);
 				long sTime = System.currentTimeMillis();
+				send(Command.PING);
 				in.readUTF();
 				totalPing += System.currentTimeMillis() - sTime;
 			}
@@ -125,11 +122,11 @@ public class ClientHandler {
 			}
 		}
 		
-		ping = totalPing / tests;
+		ping = totalPing / Config.LAG_TEST_COUNT;
 		
 		try {
 			send(Command.CLIENT_TIME);
-			lag = System.currentTimeMillis() - (Long.parseLong(in.readUTF()) + ping / 2);
+			clockOffset = System.currentTimeMillis() - (Long.parseLong(in.readUTF()) + ping / 2);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -138,7 +135,7 @@ public class ClientHandler {
 	
 	public void sendLoad(String url) {
 		loaded = false;
-		send(Command.formatCmd(Command.CLIENT_LOAD, url));
+		send(Command.format(Command.CLIENT_LOAD, url));
 	}
 	
 	public void send(String msg) {
@@ -162,10 +159,6 @@ public class ClientHandler {
 		return loaded;
 	}
 	
-	public void setLoaded(boolean l){
-		loaded = l;
-	}
-	
 	public void start() {
 		if (!isRunning) {
 			isRunning = true;
@@ -183,6 +176,7 @@ public class ClientHandler {
 	}
 	
 	private void disconnect() {
+		System.out.println("disconnect()");
 		isRunning = false;
 		
 		try {

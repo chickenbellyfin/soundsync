@@ -23,7 +23,7 @@ public class Command {
 	public static final String GOOD = "GOOD";
 	public static final String BAD = "BAD";
 	
-	public static String formatCmd(String cmd, Object... args) {
+	public static String format(String cmd, Object... args) {
 		String s = cmd;
 		for (Object arg : args) {
 			s += Command.CMD_DELIM + arg.toString();

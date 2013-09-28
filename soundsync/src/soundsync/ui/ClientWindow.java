@@ -135,16 +135,19 @@ public class ClientWindow extends JFrame implements ActionListener, SoundSyncCli
 		else if (s == addButton) {
 			URL[] song_urls = SongSelectorDialog.selectSong(songList);
 			System.out.format("Submitting URL%s:%n", song_urls.length > 1 ? "s" : "");
-			for (URL url : song_urls) {
-				soundClient.submitSong(url.toString());
-				System.out.format("\t%s%n", url);
-			}
+			soundClient.submitSong(song_urls);
+//			for (URL url : song_urls) {
+//				soundClient.submitSong(url.toString());
+//				System.out.format("\t%s%n", url);
+//			}
 		}
 		else if (s == removeButton) {
-			int[] selected = queue.table.getSelectedRows();			
-			for(int i:selected){
-				soundClient.voteRemove(songList.find(queue.getSong(i)).url.toString());
+			int[] selected = queue.table.getSelectedRows();	
+			URL[] songsToRemove = new URL[selected.length];
+			for(int i = 0; i < selected.length; i++){
+				songsToRemove[i] = songList.find(queue.getSong(i)).url;
 			}
+			soundClient.voteRemove(songsToRemove);
 		}
 	}
 	

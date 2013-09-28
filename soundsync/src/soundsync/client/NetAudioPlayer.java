@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package soundsync.client;
 
 import java.io.IOException;
@@ -14,8 +10,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.BooleanControl;
 import javax.sound.sampled.Clip;
 
-/**
- * 
+/** 
  * @author Akshay
  */
 public class NetAudioPlayer {
