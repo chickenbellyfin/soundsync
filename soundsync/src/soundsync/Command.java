@@ -2,7 +2,7 @@ package soundsync;
 
 public class Command {
 	
-	public static final String PROTOCOL_VERSION = "1";
+	public static final String PROTOCOL_VERSION = "2";
 	
 	public static final String CMD_DELIM = "|";
 	public static final String CMD_DELIM_REGEX = "\\" + Command.CMD_DELIM;
