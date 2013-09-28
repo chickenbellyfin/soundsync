@@ -48,7 +48,7 @@ public class ClientFrame extends javax.swing.JFrame {
         timeSlider = new javax.swing.JSlider();
         elapsedTime = new javax.swing.JLabel();
         remainingTime = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        mute = new javax.swing.JCheckBox();
         addButton = new javax.swing.JButton();
         removeButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -69,10 +69,10 @@ public class ClientFrame extends javax.swing.JFrame {
 
         remainingTime.setText("00:00");
 
-        jCheckBox1.setText("Mute");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        mute.setText("Mute");
+        mute.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                muteActionPerformed(evt);
             }
         });
 
@@ -115,7 +115,7 @@ public class ClientFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(title, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jCheckBox1)))
+                        .addComponent(mute)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -124,7 +124,7 @@ public class ClientFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(title)
-                    .addComponent(jCheckBox1))
+                    .addComponent(mute))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(artistalbum)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -144,9 +144,9 @@ public class ClientFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+    private void muteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_muteActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    }//GEN-LAST:event_muteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -189,8 +189,8 @@ public class ClientFrame extends javax.swing.JFrame {
     public javax.swing.JButton addButton;
     public javax.swing.JLabel artistalbum;
     public javax.swing.JLabel elapsedTime;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JCheckBox mute;
     public javax.swing.JLabel remainingTime;
     public javax.swing.JButton removeButton;
     public javax.swing.JTable songTable;

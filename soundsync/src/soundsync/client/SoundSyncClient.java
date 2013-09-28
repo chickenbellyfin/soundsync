@@ -118,6 +118,13 @@ public class SoundSyncClient {
 				voteRemove(songsToRemove);
 			}
 		});
+		
+		mFrame.mute.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				mAudio.setMute(mFrame.mute.isSelected());;			
+			}			
+		});
 	}	
 	
 	
